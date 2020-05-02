@@ -1,0 +1,17 @@
+{
+    "quiz": [
+        {
+            "id":1,
+            "question":"2 + 2",
+            "answer": 4,
+            "penalty": 0.5
+        },
+
+        {
+            "id":2,
+            "question":"6 / 2",
+            "answer": 3,
+            "penalty": 1
+        }
+    ]
+}

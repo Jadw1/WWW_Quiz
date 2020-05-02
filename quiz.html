@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible' content='IE=edge">
+    <title>Quiz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.2/css/bulma.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css">
+    <script src="main.js" defer></script>
+</head>
+
+<body>
+    <nav class="navbar" role="navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="quiz.html">
+                <h1 class="title is-3">Quiz</h1>
+            </a>
+
+            <a role="button" class="navbar-burger burger" data-target="navMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div id="navMenu" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item">
+                    Wprowadzenie
+                </a>
+
+                <a class="navbar-item">
+                    Rozpocznij quiz
+                </a>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Więcej
+                    </a>
+
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item">
+                            Instrukcja
+                        </a>
+                        <a class="navbar-item">
+                            Lista pytań
+                        </a>
+                        <a class="navbar-item">
+                            Ranking
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <section class="hero is-primary">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">Wprowadzenie</h1>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus dicta quibusdam doloribus iusto
+                    architecto cupiditate ipsa facilis ad aut quaerat!
+                </div>
+            </div>
+        </section>
+
+        <section class="has-text-centered">
+            <a id="startButton" href="" class="button is-huge is-success is-round is-centered">Start!</a>
+        </section>
+
+        <article id="instruction" class="message">
+            <div class="message-header">Instrukcja</div>
+            <div class="message-body">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae modi praesentium,
+                natus mollitia excepturi laborum eaque. Ipsam porro amet consequatur.</div>
+        </article>
+
+
+        <div class="columns is-centered has-text-centered">
+            <div class="column is-half level">
+                <div class="level-item">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Pytanie</th>
+                                <th>Odpowiedź</th>
+                                <th>Kara</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2+2</td>
+                                <td>4</td>
+                                <td>0.5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="column is-half level">
+                <div class="level-item">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nick</th>
+                                <th>Poprawnych</th>
+                                <th>Czas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Jadw1</td>
+                                <td>14/20</td>
+                                <td>00:00:14.024</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
