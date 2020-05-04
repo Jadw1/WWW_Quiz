@@ -20,7 +20,7 @@ class Stats {
         this.answeredCount = 0;
         this.totalTime = 0;
 
-        this.stats = Array.from({ length: length }, () => (
+        this.stats = Array.from({ length }, () => (
             {
                 answered: false,
                 answer: null,

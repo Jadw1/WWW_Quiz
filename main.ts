@@ -7,7 +7,7 @@ function loadQuestions() {
     const quiz = loadQuiz();
     const table = document.getElementById('questionTable');
 
-    for (let q of quiz) {
+    for (const q of quiz) {
         const tr = `<tr><td>${q.question}</td><td>${q.answer}</td><td>${q.penalty}s</td></tr>`;
         table.innerHTML += tr;
     }
@@ -27,7 +27,7 @@ function loadRanking() {
     });
     const table = document.getElementById('rankingTable');
 
-    for (let s of ranking) {
+    for (const s of ranking) {
         const tr = `<tr><td>${s.nick}</td><td>${s.correct}/${s.total}</td><td>${buildTimerString(s.time)}</td></tr>`;
 
         table.innerHTML += tr;

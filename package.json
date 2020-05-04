@@ -4,7 +4,8 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "compile": "tsc"
+    "compile": "tsc",
+    "lint": "tslint --project ."
   },
-  "author": "Michal Jadwiszczak",
+  "author": "Michal Jadwiszczak"
 }

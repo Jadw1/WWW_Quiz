@@ -3,7 +3,7 @@ function onClick() {
     const button = document.getElementById('navButton');
     const menu = document.getElementById('navMenu');
 
-    if(isActive) {
+    if (isActive) {
         button.classList.remove('is-active');
         menu.classList.remove('is-active');
     }

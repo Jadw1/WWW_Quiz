@@ -6,7 +6,7 @@ import { initNavbar } from './modules/navbar.js'
 const buttonSelector = i => '#questionList > button:nth-child(' + i + ')';
 
 let quiz: Quiz;
-let timer: Timer = new Timer(document.getElementById('stopwatch'));
+const timer: Timer = new Timer(document.getElementById('stopwatch'));
 let selectedButton: number = null;
 
 function displayOverlay() {
@@ -20,7 +20,7 @@ function displayOverlay() {
     let tP = 0;
 
     let i = 1;
-    for (let stat of quiz.stats.stats) {
+    for (const stat of quiz.stats.stats) {
         let ans = '';
         if (stat.isCorrect) {
             ans = `<span class="correct">${stat.answer}</span>`;
@@ -31,7 +31,7 @@ function displayOverlay() {
         }
         ans = `<td>${ans}</td>`;
 
-        let time = `<td>${buildTimerString(stat.time)}</td>`;
+        const time = `<td>${buildTimerString(stat.time)}</td>`;
         tT += stat.time;
 
         let penalty = '';
@@ -40,7 +40,7 @@ function displayOverlay() {
             tP += quiz.questions[i - 1].penalty;
         }
 
-        let row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
+        const row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
         resultTable.innerHTML += row;
 
         i++;
@@ -59,7 +59,6 @@ function setButtonStatus(): boolean {
     const button = document.getElementById('submitButton');
 
     if (quiz.remainingCount() <= 1) {
-        const button = document.getElementById('submitButton');
         button.classList.remove('is-success');
         button.classList.add('is-danger');
         (button as HTMLInputElement).value = 'Zakończ';
@@ -80,7 +79,7 @@ function selectQuestion(this: HTMLElement) {
 }
 
 function setActiveQuestion(i: number) {
-    let question = quiz.setActiveQuestion(i, timer.getTime());
+    const question = quiz.setActiveQuestion(i, timer.getTime());
 
     document.getElementById('question').innerText = question.question;
     document.getElementById('penalty').innerText = question.penalty.toString();
@@ -151,7 +150,7 @@ function createButtons() {
     const questionCount = quiz.questions.length;
 
     for (let i = 1; i <= questionCount; i++) {
-        let button = buttonTemplate.content.cloneNode(true) as HTMLElement;
+        const button = buttonTemplate.content.cloneNode(true) as HTMLElement;
         buttonList.appendChild(button);
     }
     for (let i = 1; i <= questionCount; i++) {
@@ -175,10 +174,10 @@ function verifyNick() {
 
 function save(event: Event) {
     event.preventDefault();
-    const save = (document.getElementById('saveStats') as HTMLInputElement).checked;
+    const doSave = (document.getElementById('saveStats') as HTMLInputElement).checked;
     const stats = quiz.stats;
     let questions: IQuestionStat[];
-    if (save) {
+    if (doSave) {
         questions = [];
     }
 
@@ -186,7 +185,7 @@ function save(event: Event) {
     let correct = 0;
     let penalty = 0;
     let i = 0;
-    for (let stat of stats.stats) {
+    for (const stat of stats.stats) {
         if (!stat.isCorrect) {
             penalty += quiz.questions[i].penalty;
         }
@@ -194,7 +193,7 @@ function save(event: Event) {
             correct++;
         }
 
-        if (save) {
+        if (doSave) {
             const qStat: IQuestionStat = {
                 correct: stat.isCorrect,
                 time: stat.time,
@@ -208,10 +207,10 @@ function save(event: Event) {
     const result: IStatistic = {
         nick: (document.getElementById('nick') as HTMLInputElement).value,
         time: stats.totalTime + 1000 * penalty,
-        correct: correct,
+        correct,
         total: quiz.questions.length
     };
-    if (save) {
+    if (doSave) {
         result.questions = questions;
     }
     saveToLocalStorage(result);

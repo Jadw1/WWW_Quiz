@@ -1,14 +1,14 @@
-function pad(number: number, size: number): string {
-    const str = "000" + number;
+function pad(num: number, size: number): string {
+    const str = "000" + num;
     return str.substr(str.length - size);
 }
 
 export function buildTimerString(time: number): string {
     let sec = Math.floor(time / 1000);
-    let milisec = time - (sec * 1000);
+    const milisec = time - (sec * 1000);
     let min = Math.floor(sec / 60);
     sec = sec - (min * 60);
-    let hours = Math.floor(min / 60);
+    const hours = Math.floor(min / 60);
     min = min - (hours * 60);
 
     return pad(hours, 2) + ':' + pad(min, 2) + ':' + pad(sec, 2) + '.' + pad(milisec, 3);
@@ -51,7 +51,7 @@ export class Timer {
     }
 
     update() {
-        if(this.paused) {
+        if (this.paused) {
             return;
         }
 

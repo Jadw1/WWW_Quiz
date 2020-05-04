@@ -15,7 +15,7 @@ export interface IStatistic {
 const lsKey = 'statistics';
 export function saveToLocalStorage(el: IStatistic) {
     let statistics = JSON.parse(localStorage.getItem(lsKey)) as IStatistic[];
-    if(statistics === null) {
+    if (statistics === null) {
         statistics = [];
     }
 
@@ -25,7 +25,7 @@ export function saveToLocalStorage(el: IStatistic) {
 
 export function getStatistics(): IStatistic[] {
     let statistics = JSON.parse(localStorage.getItem(lsKey)) as IStatistic[];
-    if(statistics === null) {
+    if (statistics === null) {
         statistics = [];
     }
 
