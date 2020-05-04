@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "npx tsc -lib es2016,dom main.ts"
+    "compile": "tsc"
   },
   "keywords": [],
   "author": "Michal Jadwiszczak",

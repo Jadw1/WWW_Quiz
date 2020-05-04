@@ -9,10 +9,68 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.2/css/bulma.css">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-    <script src="playMain.js" defer></script>
+    <script type="module" src="playMain.js" defer></script>
 </head>
 
 <body>
+    <div id="overlay" class="is-overlay">
+        <div class="message">
+            <div class="message-header">
+                <h1>Wynik</h1>
+            </div>
+            <div class="message-body">
+                <div class="level">
+                    <div id="results" class="level-item">
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <td>Poprawnych odpowiedzi</td>
+                                    <td id="correctCounter"></td>
+                                </tr>
+                                <tr>
+                                    <td>Całkowity czas</td>
+                                    <td id="totalTime"></td>
+                                </tr>
+                                <tr>
+                                    <td>Łączna kara</td>
+                                    <td id="totalPenalty"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table is-striped">
+                            <thead>
+                                <tr>
+                                    <th class="center-cell">Zadanie</th>
+                                    <th class="center-cell">Odpowiedź</th>
+                                    <th class="center-cell">Czas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultTable">
+                            </tbody>
+                        </table>
+                        <form id='saveForm'>
+                            <div class="label">Podaj swój nick:</div>
+                            <input id="nick" class="input is-focused" type="text" placeholder="Nick">
+                            <label class="checkbox">
+                                <input type="checkbox" id="saveStats">
+                                Zapisz statystyki
+                            </label>
+                            <div class="level">
+                                <div class="level-left"></div>
+                                <div class="level-right">
+                                    <div class="level-item buttons">
+                                        <input id="save" class="button is-success" type="submit" value="Zapisz">
+                                        <input id="cancel" type="button" class="button is-danger" value="Anuluj">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <nav class="navbar" role="navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="quiz.html">
@@ -57,6 +115,8 @@
         </div>
     </nav>
 
+
+
     <div class="main-container">
         <div id="questionList" class="buttons are-small horizontal-scroll">
 
@@ -64,7 +124,7 @@
 
         <div class="level">
             <div class="level-left">
-                Kara za  błędną odpowiedź:&nbsp;<span id="penalty"></span>s
+                Kara za błędną odpowiedź:&nbsp;<span id="penalty"></span>s
             </div>
             <div class="level-right">
                 <div id="stopwatch">
@@ -83,13 +143,13 @@
                     </div>
                 </div>
             </div>
-    
+
             <div class="level">
                 <div class="level-left"></div>
                 <div class="level-right">
                     <div class="level-item buttons">
                         <input id="submitButton" type="submit" class="button is-success" value="Następne">
-                        <input type="button" class="button" value="Pomiń">
+                        <input id="skipButton" type="button" class="button" value="Pomiń">
                     </div>
                 </div>
             </div>
@@ -97,7 +157,7 @@
     </div>
 
     <template id="questionButtonTemplate">
-        <button class="button is-outlined is-info is-light" onclick="setActiveQuestion(this.innerText)">
+        <button class="button is-outlined is-info">
             1
         </button>
     </template>

@@ -54,6 +54,49 @@
     width: 60px;
 }
 
+#overlay {
+    background-color: rgba(49, 175, 192, 0.555);
+    width: 100%;
+    height: 100%;
+    padding-top: 150px;
+    padding-left: 20%;
+    padding-right: 20%;
+    z-index: 999;
+    display: none;
+}
+
+#overlay > .message > .message-header {
+    justify-content: center;
+}
+
+#results {
+    display: flexbox;
+    flex-direction: column;
+}
+
+#resultTable > tr > td {
+    text-align: center;
+}
+
+.center-cell {
+    text-align: center;
+}
+
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.answer-info {
+    color: blue;
+}
+
 /* Removing arrows from input of type = number */
 
 /* Chrome, Safari, Edge, Opera */
@@ -76,6 +119,12 @@ input[type=number] {
     #answer {
         width: 2.5em;
     }
+
+    #overlay {
+        padding-top: 100px;
+        padding-right: 10%;
+        padding-left: 10%;
+    }
 }
 
 @media screen and (max-width: 599px) {
@@ -85,5 +134,11 @@ input[type=number] {
 
     #answer {
         width: 1.5em;
+    }
+
+    #overlay {
+        padding-top: 50px;
+        padding-right: 0;
+        padding-left: 0;
     }
 }

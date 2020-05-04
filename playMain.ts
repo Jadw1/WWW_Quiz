@@ -1,159 +1,246 @@
-import { teeest } from ""
+import { IQuestion, Quiz, IStat, Stats, loadQuiz } from './quiz.js';
+import { Timer, buildTimerString } from './timer.js'
+import { IQuestionStat, IStatistic, saveToLocalStorage } from './statistics.js';
 
-interface IQuestion {
-    question: string;
-    answer: number;
-    penalty: number;
-}
-
-interface IStats {
-    answered: boolean;
-    answer: number;
-    isCorrect: boolean;
-    time: number;
-}
-
-interface IQuizStats {
-    stats: IStats[];
-    totalAnswered: number;
-    totalTime: number;
-}
-
-const buttonList = document.getElementById('questionList');
 const buttonSelector = i => '#questionList > button:nth-child(' + i + ')';
-const question = document.getElementById('question');
-const penalty = document.getElementById('penalty');
 
-let activeQuestion: number = 0;
-let quiz: IQuestion[] = null;
-let quizStats: IQuizStats = null;
+let quiz: Quiz;
+let timer: Timer = new Timer(document.getElementById('stopwatch'));
+let selectedButton: number = null;
 
-function loadQuiz() {
-    const quizString = `{
-        "quiz": [
-            {
-                "question":"2 * 2",
-                "answer": 4,
-                "penalty": 0.5
-            },
-            {
-                "question":"6 / 2",
-                "answer": 3,
-                "penalty": 1
-            },
-            {
-                "question":"2 - (-24 : 4)",
-                "answer": 8,
-                "penalty": 1
-            },
-            {
-                "question":"2 - (-24 : 4) + 2 * 2",
-                "answer": 12,
-                "penalty": 1
-            },
-            {
-                "question":"2 - (-24 : 4) + 2 * 2",
-                "answer": 8,
-                "penalty": 1
-            }
-        ]
-    }`;
-    const createStats = () => {
-        return {
-            answered: false,
-            answer: null,
-            isCorrect: null,
-            time: 0
-        } as IStats;
-    };
+function displayOverlay() {
+    const correctCounter = document.getElementById('correctCounter');
+    const totalTime = document.getElementById('totalTime');
+    const totalPenalty = document.getElementById('totalPenalty');
+    const resultTable = document.getElementById('resultTable');
 
-    const quizJSON = JSON.parse(quizString);
-    quiz = quizJSON.quiz;
+    let correct = 0;
+    let tT = 0;
+    let tP = 0;
 
-    quizStats = {
-        stats: new Array<IStats>(quiz.length),
-        totalAnswered: 0,
-        totalTime: 0
+    let i = 1;
+    for (let stat of quiz.stats.stats) {
+        let ans = '';
+        if (stat.isCorrect) {
+            ans = `<span class="correct">${stat.answer}</span>`;
+            correct++;
+        }
+        else {
+            ans = `<span class="wrong">${stat.answer}</span>&nbsp;<span class="answer-info">${quiz.questions[i - 1].answer}</span>`;
+        }
+        ans = `<td>${ans}</td>`;
+        
+        let time = `<td>${buildTimerString(stat.time)}</td>`;
+        tT += stat.time;
+
+        let penalty = '';
+        if(!stat.isCorrect) {
+            penalty = `<td>+ ${quiz.questions[i-1].penalty}s</td>`;
+            tP += quiz.questions[i-1].penalty;
+        }
+
+        let row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
+        resultTable.innerHTML += row;
+
+        i++;
     }
-    quizStats.stats.fill(createStats());
+
+    correctCounter.innerText = `${correct}/${quiz.questions.length}`
+    totalTime.innerText = `${buildTimerString(tT)}`;
+    totalPenalty.innerText = `+ ${tP}s`;
+
+    const overlay = document.getElementById('overlay');
+    overlay.style.display = 'block';
 }
 
-function loadPage() {
-    const buttonTemplate = document.getElementById('questionButtonTemplate') as HTMLTemplateElement;
-
-    for(let i = 1; i <= quiz.length; i++) {
-        let button = buttonTemplate.content.cloneNode(true) as HTMLElement;
-        buttonList.appendChild(button);
-    }
-    for(let i = 1; i <= quiz.length; i++) {
-        const button = document.querySelector(buttonSelector(i)) as HTMLElement;
-        button.innerText = i.toString();
-    }
-}
-
-function setActiveQuestion(i: number) {
-    if(i <= 0 || i > quiz.length) {
-        return;
-    }
-
-    activeQuestion = i;
-    question.innerText = quiz[activeQuestion - 1].question;
-    penalty.innerText = quiz[activeQuestion - 1].penalty.toString();
-}
-
-function pad(number: number, size: number): string {
-    const str = "000" + number;
-    return str.substr(str.length - size);
-}
-
-function runStopwatch() {
-    const refreshTime = 1;
-    const stopwatch = document.getElementById('stopwatch');
-    const buildString = milis => {
-        let sec = Math.floor(milis/1000);
-        let milisec = milis - (sec * 1000);
-        let min = Math.floor(sec/60);
-        sec = sec - (min*60);
-        let hours = Math.floor(min/60);
-        min = min - (hours *60);
-
-        return pad(hours, 2) + ':' + pad(min, 2) + ':' + pad(sec, 2) + '.' + pad(milisec, 3);
-    }
-
-    const startTime = Date.now();
-    const update = () => {
-        stopwatch.innerText = buildString(Date.now() - startTime);
-    }
-
-    setInterval(update, refreshTime);
-}
-
-function setButtonStatus(): boolean{
+function setButtonStatus(): boolean {
     const input = document.getElementById('answer') as HTMLInputElement;
     const button = document.getElementById('submitButton');
-    if(input.value.trim().length > 0) {
+
+    if (quiz.remainingCount() <= 1) {
+        const button = document.getElementById('submitButton');
+        button.classList.remove('is-success');
+        button.classList.add('is-danger');
+        (button as HTMLInputElement).value = 'Zakończ';
+    }
+
+    if (input.value.trim().length > 0 && !quiz.isAnswered(selectedButton)) {
         button.removeAttribute('disabled');
-        return false;
+        return true;
     }
     else {
         button.setAttribute('disabled', '');
-        return true;
+        return false;
     }
+}
+
+function selectQuestion(this: HTMLElement) {
+    setActiveQuestion(Number(this.innerText));
+}
+
+function setActiveQuestion(i: number) {
+    let question = quiz.setActiveQuestion(i, timer.getTime());
+
+    document.getElementById('question').innerText = question.question;
+    document.getElementById('penalty').innerText = question.penalty.toString();
+
+    const answer = document.getElementById('answer') as HTMLInputElement;
+    console.log("loool " + i);
+    if (quiz.isAnswered(i)) {
+        timer.pause();
+        answer.value = quiz.stats.stats[i - 1].answer.toString();
+        answer.setAttribute('disabled', '');
+    }
+    else {
+        timer.resume();
+        answer.value = '';
+        answer.removeAttribute('disabled');
+    }
+
+    if (selectedButton !== null) {
+        document.querySelector(buttonSelector(selectedButton)).classList.add('is-outlined');
+    }
+
+    selectedButton = i;
+    document.querySelector(buttonSelector(selectedButton)).classList.remove('is-outlined');
+
+    setButtonStatus();
 }
 
 function submitQuestion(event: Event) {
-    if(setButtonStatus()) {
-        console.log('test'); 
-    }
     event.preventDefault();
+    if (setButtonStatus()) {
+        const answer = (document.getElementById('answer') as HTMLInputElement).valueAsNumber;
+        const result = quiz.answerQuestion(answer, timer.getTime());
+
+        if (result === null) {
+            return;
+        }
+
+        const questionButton = document.querySelector(buttonSelector(quiz.activeQuestion));
+        questionButton.classList.remove('is-info');
+        if (result) {
+            questionButton.classList.add('is-success');
+        }
+        else {
+            questionButton.classList.add('is-danger');
+        }
+
+        const next = quiz.nextQuestion();
+        console.log("next: " + next);
+        if (next > 0) {
+            setActiveQuestion(next);
+        }
+        else {
+            timer.pause();
+            displayOverlay();
+        }
+    }
 }
 
-const form = document.getElementById('quizForm');
-form.addEventListener('input', setButtonStatus);
-form.addEventListener('submit', submitQuestion);
+function skip() {
+    const next = quiz.nextQuestion()
+    if (next > 0) {
+        setActiveQuestion(next);
+    }
+}
 
-loadQuiz();
-loadPage();
-setActiveQuestion(1);
-runStopwatch();
-setButtonStatus();
+function createButtons() {
+    const buttonList = document.getElementById('questionList');
+    const buttonTemplate = document.getElementById('questionButtonTemplate') as HTMLTemplateElement;
+
+    const questionCount = quiz.questions.length;
+
+    for (let i = 1; i <= questionCount; i++) {
+        let button = buttonTemplate.content.cloneNode(true) as HTMLElement;
+        buttonList.appendChild(button);
+    }
+    for (let i = 1; i <= questionCount; i++) {
+        const button = document.querySelector(buttonSelector(i)) as HTMLElement;
+        button.innerText = i.toString();
+        button.addEventListener('click', selectQuestion)
+    }
+}
+
+function verifyNick() {
+    const nick = (document.getElementById('nick') as HTMLInputElement).value;
+    const saveButton = document.getElementById('save');
+
+    if(nick.trim().length > 0) {
+        saveButton.removeAttribute('disabled');
+    }
+    else {
+        saveButton.setAttribute('disabled', '');
+    }
+}
+
+function save(event: Event) {
+    event.preventDefault();
+    const save = (document.getElementById('saveStats') as HTMLInputElement).checked;
+    const stats = quiz.stats;
+    let questions: IQuestionStat[];
+    if(save) {
+        questions = [];
+    }
+    
+
+    let correct = 0;
+    let penalty = 0;
+    let i = 0;
+    for(let stat of stats.stats) {
+        if(!stat.isCorrect) {
+            penalty += quiz.questions[i].penalty;
+        }
+        else {
+            correct++;
+        }
+
+        if(save) {
+            const qStat: IQuestionStat = {
+                correct: stat.isCorrect,
+                time: stat.time,
+                answer: stat.answer
+            };
+            questions.push(qStat);
+        }
+
+    }
+
+    const result: IStatistic = {
+        nick: (document.getElementById('nick') as HTMLInputElement).value,
+        time: stats.totalTime + 1000 * penalty,
+        correct: correct,
+        total: quiz.questions.length
+    };
+    if(save) {
+        result.questions = questions;
+    }
+    saveToLocalStorage(result);
+
+    window.location.href = './quiz.html';
+}
+
+function cancel() {
+    window.location.href = './quiz.html';
+}
+
+function init() {
+    const form = document.getElementById('quizForm');
+    form.addEventListener('input', setButtonStatus);
+    form.addEventListener('submit', submitQuestion);
+    document.getElementById('skipButton').addEventListener('click', skip);
+
+    const saveForm = document.getElementById('saveForm');
+    saveForm.addEventListener('input', verifyNick);
+    saveForm.addEventListener('submit', save);
+    document.getElementById('cancel').addEventListener('click', cancel);
+
+    quiz = new Quiz(loadQuiz());
+    createButtons();
+    timer.run();
+    setActiveQuestion(1);
+    setButtonStatus();
+    verifyNick();
+}
+
+init();
