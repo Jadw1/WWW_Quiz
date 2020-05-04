@@ -151,6 +151,11 @@ const quizString = `{
             "question": "2 + 2 * 2",
             "answer": 6,
             "penalty": 2
+        },
+        {
+            "question": "(2^3 * 3^2 + 5) / 7",
+            "answer": 11,
+            "penalty": 4.2
         }
     ]
 }`;
