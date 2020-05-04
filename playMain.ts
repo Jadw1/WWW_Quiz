@@ -1,6 +1,7 @@
-import { IQuestion, Quiz, IStat, Stats, loadQuiz } from './quiz.js';
-import { Timer, buildTimerString } from './timer.js'
-import { IQuestionStat, IStatistic, saveToLocalStorage } from './statistics.js';
+import { IQuestion, Quiz, IStat, Stats, loadQuiz } from './modules/quiz.js';
+import { Timer, buildTimerString } from './modules/timer.js'
+import { IQuestionStat, IStatistic, saveToLocalStorage } from './modules/statistics.js';
+import { initNavbar } from './modules/navbar.js'
 
 const buttonSelector = i => '#questionList > button:nth-child(' + i + ')';
 
@@ -29,14 +30,14 @@ function displayOverlay() {
             ans = `<span class="wrong">${stat.answer}</span>&nbsp;<span class="answer-info">${quiz.questions[i - 1].answer}</span>`;
         }
         ans = `<td>${ans}</td>`;
-        
+
         let time = `<td>${buildTimerString(stat.time)}</td>`;
         tT += stat.time;
 
         let penalty = '';
-        if(!stat.isCorrect) {
-            penalty = `<td>+ ${quiz.questions[i-1].penalty}s</td>`;
-            tP += quiz.questions[i-1].penalty;
+        if (!stat.isCorrect) {
+            penalty = `<td>+ ${quiz.questions[i - 1].penalty}s</td>`;
+            tP += quiz.questions[i - 1].penalty;
         }
 
         let row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
@@ -85,7 +86,6 @@ function setActiveQuestion(i: number) {
     document.getElementById('penalty').innerText = question.penalty.toString();
 
     const answer = document.getElementById('answer') as HTMLInputElement;
-    console.log("loool " + i);
     if (quiz.isAnswered(i)) {
         timer.pause();
         answer.value = quiz.stats.stats[i - 1].answer.toString();
@@ -127,7 +127,6 @@ function submitQuestion(event: Event) {
         }
 
         const next = quiz.nextQuestion();
-        console.log("next: " + next);
         if (next > 0) {
             setActiveQuestion(next);
         }
@@ -166,7 +165,7 @@ function verifyNick() {
     const nick = (document.getElementById('nick') as HTMLInputElement).value;
     const saveButton = document.getElementById('save');
 
-    if(nick.trim().length > 0) {
+    if (nick.trim().length > 0) {
         saveButton.removeAttribute('disabled');
     }
     else {
@@ -179,23 +178,23 @@ function save(event: Event) {
     const save = (document.getElementById('saveStats') as HTMLInputElement).checked;
     const stats = quiz.stats;
     let questions: IQuestionStat[];
-    if(save) {
+    if (save) {
         questions = [];
     }
-    
+
 
     let correct = 0;
     let penalty = 0;
     let i = 0;
-    for(let stat of stats.stats) {
-        if(!stat.isCorrect) {
+    for (let stat of stats.stats) {
+        if (!stat.isCorrect) {
             penalty += quiz.questions[i].penalty;
         }
         else {
             correct++;
         }
 
-        if(save) {
+        if (save) {
             const qStat: IQuestionStat = {
                 correct: stat.isCorrect,
                 time: stat.time,
@@ -203,7 +202,7 @@ function save(event: Event) {
             };
             questions.push(qStat);
         }
-
+        i++;
     }
 
     const result: IStatistic = {
@@ -212,7 +211,7 @@ function save(event: Event) {
         correct: correct,
         total: quiz.questions.length
     };
-    if(save) {
+    if (save) {
         result.questions = questions;
     }
     saveToLocalStorage(result);
@@ -236,6 +235,7 @@ function init() {
     document.getElementById('cancel').addEventListener('click', cancel);
 
     quiz = new Quiz(loadQuiz());
+    initNavbar();
     createButtons();
     timer.run();
     setActiveQuestion(1);

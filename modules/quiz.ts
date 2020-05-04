@@ -131,6 +131,26 @@ const quizString = `{
             "question": "35 * 24",
             "answer": 840,
             "penalty": 2.25
+        },
+        {
+            "question": "2 - (-24 : 4)",
+            "answer": 8,
+            "penalty": 3
+        },
+        {
+            "question": "(3^2 + 8) -  10 / 5",
+            "answer": 15,
+            "penalty": 4.5
+        },
+        {
+            "question": "12 * 12 -  (10 / 5)^3",
+            "answer": 136,
+            "penalty": 4.25
+        },
+        {
+            "question": "2 + 2 * 2",
+            "answer": 6,
+            "penalty": 2
         }
     ]
 }`;

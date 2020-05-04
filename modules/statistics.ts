@@ -22,3 +22,12 @@ export function saveToLocalStorage(el: IStatistic) {
     statistics.push(el);
     localStorage.setItem(lsKey, JSON.stringify(statistics));
 }
+
+export function getStatistics(): IStatistic[] {
+    let statistics = JSON.parse(localStorage.getItem(lsKey)) as IStatistic[];
+    if(statistics === null) {
+        statistics = [];
+    }
+
+    return statistics;
+}

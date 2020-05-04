@@ -18,9 +18,9 @@
             <div class="message-header">
                 <h1>Wynik</h1>
             </div>
-            <div class="message-body">
-                <div class="level">
-                    <div id="results" class="level-item">
+            <div id="overlayBody" class="message-body">
+                <div class="level dont-overflow">
+                    <section id="results" class="level-item dont-overflow">
                         <table class="table">
                             <tbody>
                                 <tr>
@@ -37,7 +37,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <table class="table is-striped">
+                        <table class="table is-striped dont-overflow">
                             <thead>
                                 <tr>
                                     <th class="center-cell">Zadanie</th>
@@ -45,7 +45,7 @@
                                     <th class="center-cell">Czas</th>
                                 </tr>
                             </thead>
-                            <tbody id="resultTable">
+                            <tbody id="resultTable" class="dont-overflow">
                             </tbody>
                         </table>
                         <form id='saveForm'>
@@ -65,7 +65,7 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
                 <h1 class="title is-3">Quiz</h1>
             </a>
 
-            <a role="button" class="navbar-burger burger" data-target="navMenu">
+            <a id="navButton" role="button" class="navbar-burger burger" data-target="navMenu">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -90,7 +90,7 @@
                     Wprowadzenie
                 </a>
 
-                <a class="navbar-item">
+                <a class="navbar-item" href="play.html">
                     Rozpocznij quiz
                 </a>
 
@@ -100,13 +100,13 @@
                     </a>
 
                     <div class="navbar-dropdown">
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="quiz.html#instruction">
                             Instrukcja
                         </a>
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="quiz.html#questions">
                             Lista pytań
                         </a>
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="quiz.html#ranking">
                             Ranking
                         </a>
                     </div>
@@ -118,11 +118,17 @@
 
 
     <div class="main-container">
-        <div id="questionList" class="buttons are-small horizontal-scroll">
+        <section class="message is-dark">
+            <div class="message-header">Wprowadzenie</div>
+            <div class="message-body">
+                Liczyć każdy może! Powodzenia!
+            </div>
+        </section>
 
-        </div>
+        <section id="questionList" class="buttons are-small horizontal-scroll">
+        </section>
 
-        <div class="level">
+        <section class="level">
             <div class="level-left">
                 Kara za błędną odpowiedź:&nbsp;<span id="penalty"></span>s
             </div>
@@ -131,15 +137,17 @@
                     00:00:00
                 </div>
             </div>
-        </div>
+        </section>
 
         <form id='quizForm'>
-            <div class="level">
-                <div class="level-item">
-                    <div id="questionBox" class="field has-addons is-more-huge">
+            <div class="level dont-overflow">
+                <div class="level-item dont-overflow">
+                    <div id="questionBox" class="is-more-huge dont-overflow">
                         <div id="question">2 + 2</div>
-                        <div>&nbsp;=&nbsp;</div>
-                        <input id="answer" type="number">
+                        <span class="field has-addons is-more-huge">
+                            <div>&nbsp;=&nbsp;</div>
+                            <input id="answer" type="number">
+                        </span>
                     </div>
                 </div>
             </div>

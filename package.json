@@ -2,11 +2,9 @@
   "name": "quiz",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "compile": "tsc"
   },
-  "keywords": [],
   "author": "Michal Jadwiszczak",
-  "license": "ISC"
 }

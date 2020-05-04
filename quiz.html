@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.2/css/bulma.css">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-    <script src="main.js" defer></script>
+    <script type="module" src="main.js" defer></script>
 </head>
 
 <body>
@@ -19,7 +19,7 @@
                 <h1 class="title is-3">Quiz</h1>
             </a>
 
-            <a role="button" class="navbar-burger burger" data-target="navMenu">
+            <a id="navButton" role="button" class="navbar-burger burger" data-target="navMenu">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -28,11 +28,11 @@
 
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item">
+                <a class="navbar-item" href="#introduction">
                     Wprowadzenie
                 </a>
 
-                <a class="navbar-item">
+                <a class="navbar-item" href="play.html">
                     Rozpocznij quiz
                 </a>
 
@@ -42,13 +42,13 @@
                     </a>
 
                     <div class="navbar-dropdown">
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="#instruction">
                             Instrukcja
                         </a>
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="#questions">
                             Lista pytań
                         </a>
-                        <a class="navbar-item">
+                        <a class="navbar-item" href="#ranking">
                             Ranking
                         </a>
                     </div>
@@ -58,31 +58,32 @@
     </nav>
 
     <div class="main-container">
-        <section class="hero is-primary">
+        <section class="hero is-dark">
             <div class="hero-body">
-                <div class="container">
+                <div id="introduction" class="container">
                     <h1 class="title">Wprowadzenie</h1>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus dicta quibusdam doloribus iusto
-                    architecto cupiditate ipsa facilis ad aut quaerat!
+                    Liczyć każdy może! Powodzenia!
                 </div>
             </div>
         </section>
 
         <section class="has-text-centered">
-            <a id="startButton" href="" class="button is-huge is-success is-round is-centered">Start!</a>
+            <a id="startButton" href="play.html" class="button is-huge is-success is-round is-centered">Start!</a>
         </section>
 
-        <article id="instruction" class="message">
+        <section id="instruction" class="message is-dark">
             <div class="message-header">Instrukcja</div>
-            <div class="message-body">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vitae modi praesentium,
-                natus mollitia excepturi laborum eaque. Ipsam porro amet consequatur.</div>
-        </article>
+            <div class="message-body">
+                Quiz składa się z 10 pytań. Należy odpowiedzień na każde z nich. Za błedną odpowiedź jest kara czasowa.
+                Wynikiem końcowym jest łączny czas rozwiązania quizu.
+            </div>
+        </section>
 
 
         <div class="columns is-centered has-text-centered">
             <div class="column is-half level">
-                <div class="level-item">
-                    <table class="table">
+                <section class="level-item">
+                    <table id="questions" class="table">
                         <thead>
                             <tr>
                                 <th>Pytanie</th>
@@ -90,19 +91,16 @@
                                 <th>Kara</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="questionTable">
                             <tr>
-                                <td>2+2</td>
-                                <td>4</td>
-                                <td>0.5</td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
+                </section>
             </div>
             <div class="column is-half level">
-                <div class="level-item">
-                    <table class="table">
+                <section class="level-item">
+                    <table id="ranking" class="table">
                         <thead>
                             <tr>
                                 <th>Nick</th>
@@ -110,15 +108,10 @@
                                 <th>Czas</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Jadw1</td>
-                                <td>14/20</td>
-                                <td>00:00:14.024</td>
-                            </tr>
+                        <tbody id="rankingTable">
                         </tbody>
                     </table>
-                </div>
+                </section>
             </div>
         </div>
     </div>

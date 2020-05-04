@@ -24,7 +24,7 @@
 }
 
 .horizontal-scroll {
-    overflow-x: scroll;
+    overflow-x: auto;
     flex-wrap: nowrap;
 }
 
@@ -39,11 +39,19 @@
 #startButton {
     width: 5em;
     height: 5em;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 #instruction {
     margin-right: 5%;
     margin-left: 5%;
+}
+
+#questionBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 #questionContainer {
@@ -52,6 +60,11 @@
 
 #questionList > button {
     width: 60px;
+}
+
+.dont-overflow {
+    max-width: 95%;
+    overflow-x: auto;
 }
 
 #overlay {
@@ -127,7 +140,7 @@ input[type=number] {
     }
 }
 
-@media screen and (max-width: 599px) {
+@media screen and (min-width: 450px) and (max-width: 599px) {
     .is-more-huge, .is-more-huge > input {
         font-size: 4rem;
     }
@@ -140,5 +153,46 @@ input[type=number] {
         padding-top: 50px;
         padding-right: 0;
         padding-left: 0;
+    }
+
+    #startButton {
+        width: 4.5em;
+        height: 4.5em;
+    }
+
+    .main-container {
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+}
+
+@media screen and (max-width: 449px) {
+    .is-more-huge, .is-more-huge > input {
+        font-size: 3rem;
+    }
+
+    #answer {
+        width: 1.5em;
+    }
+
+    #overlay {
+        padding-top: 50px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    #startButton {
+        width: 4em;
+        height: 4em;
+    }
+
+    .main-container {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #overlayBody {
+        padding-left: 2%;
+        padding-right: 2%;
     }
 }
