@@ -77,6 +77,7 @@ class Quiz {
     }
 
     nextQuestion(): number {
+        let first: boolean = true;
         let active = (this.activeQuestion - 1) + 1;
         if (active === this.questions.length) {
             active = 0;
@@ -89,8 +90,11 @@ class Quiz {
             if (!this.stats.stats[i].answered) {
                 return i + 1;
             }
-            else if (i === active) {
+            else if (i === active && !first) {
                 return -1;
+            }
+            else {
+                first = false;
             }
 
         }
