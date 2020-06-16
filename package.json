@@ -4,8 +4,31 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "compile": "tsc",
-    "lint": "tslint --project ."
+    "run": "node dist/server/app.js",
+    "compile": "npm run compile-front && npm run compile-server",
+    "lint": "tslint --project .",
+    "compile-front": "tsc --project tsconfig_frontend.json",
+    "compile-server": "tsc --project tsconfig_server.json"
   },
-  "author": "Michal Jadwiszczak"
+  "author": "Michal Jadwiszczak",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "connect-sqlite3": "^0.9.11",
+    "cookie-parser": "^1.4.5",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "sqlite3": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.6",
+    "@types/express-session": "^1.17.0",
+    "@types/node": "^14.0.1",
+    "@types/sqlite3": "^3.1.6",
+    "@types/csurf": "^1.9.36",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.3"
+  }
 }
