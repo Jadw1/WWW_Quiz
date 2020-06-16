@@ -2,10 +2,10 @@
     "compilerOptions": {
         "target": "es2016",
         "removeComments": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "lib": [
             "es5",
-            "dom",
+            "DOM",
             "ES2015"
         ],
         "watch": false,

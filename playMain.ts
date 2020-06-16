@@ -1,6 +1,6 @@
 import { IQuestion, Quiz, IStat, Stats, loadQuiz } from './modules/quiz.js';
 import { Timer, buildTimerString } from './modules/timer.js'
-import { IQuestionStat, IStatistic, saveToLocalStorage } from './modules/statistics.js';
+import { IQuestionStat, IStatistic, saveToDB } from './modules/statistics.js';
 import { initNavbar } from './modules/navbar.js'
 
 const buttonSelector = i => '#questionList > button:nth-child(' + i + ')';
@@ -213,9 +213,9 @@ function save(event: Event) {
     if (doSave) {
         result.questions = questions;
     }
-    saveToLocalStorage(result);
-
-    window.location.href = './quiz.html';
+    saveToDB(result).then(() => {
+        window.location.href = './quiz.html';
+    });
 }
 
 function cancel() {

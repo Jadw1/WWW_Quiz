@@ -13,8 +13,8 @@ function loadQuestions() {
     }
 }
 
-function loadRanking() {
-    const ranking = getStatistics().sort((s1, s2) => {
+async function loadRanking() {
+    const ranking = (await getStatistics()).sort((s1, s2) => {
         if (s1.time < s2.time) {
             return -1;
         }
