@@ -121,13 +121,13 @@ export class Database {
     async changePassword(username: string, password: string): Promise<void> {
         const sql = `
             UPDATE user
-            WHERE username = ?
             SET pass_hash = ?
+            WHERE username = ?;
         `;
 
         return this.genSalt()
             .then(salt => this.hashPassword(password, salt))
-            .then(hash => this._exec.execRun(sql, [username, hash]));
+            .then(hash => this._exec.execRun(sql, [hash, username]));
     }
 
     private async genSalt(): Promise<string> {

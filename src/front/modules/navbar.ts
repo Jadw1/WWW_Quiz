@@ -45,5 +45,6 @@ export function initNavbar() {
     document.getElementById('panelBg').addEventListener('click', closeLoginPanel);
     document.getElementById('panelClose').addEventListener('click', closeLoginPanel);
     document.getElementById('changePassButton').addEventListener('click', openChangePanel);
-    document.getElementById('changePassButton').addEventListener('click', closeChangePanel);
+    document.getElementById('changePanelBg').addEventListener('click', closeChangePanel);
+    document.getElementById('changePanelClose').addEventListener('click', closeChangePanel);
 }

@@ -78,16 +78,23 @@ app.post('/change', csrfProtection, (req, res) => {
     const pass1 = req.body.pass1;
     const pass2 = req.body.pass2;
     const user = req.session.username;
-    // if(pass1 !== pass2) {
-
-    // }
+    if(!user) {
+        res.render('quiz', { showChangePanel: true, changeErr: 'No logged user.', user: req?.session?.username, csrfToken: req.csrfToken() });
+        return;
+    }
+    if(pass1 !== pass2) {
+        res.render('quiz', { showChangePanel: true, changeErr: 'Passwords are not the same.', user: req?.session?.username, csrfToken: req.csrfToken() });
+        return;
+    }
 
     db.changePassword(user, pass1).then(() => sessionDb.removeSessions(user)).then(() => {
         res.redirect('/');
-    })
-})
+    }).catch(err => {
+        res.render('quiz', { showChangePanel: true, changeErr: err, user: req?.session?.username, csrfToken: req.csrfToken() });
+    });
+});
 
 const server = app.listen(1500,() => {
     console.log(`App is running at http://localhost:1500/ in ${app.get('env')} mode`);
     console.log('Press Ctrl+C to stop.');
-})
+});

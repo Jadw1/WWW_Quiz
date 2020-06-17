@@ -74,7 +74,7 @@ html(lang='pl-PL')
       #panelClose.modal-close.is-large(aria-label='close')
 
     #changePanel.modal(class=showChangePanel ? 'is-active' : '')
-      #panelBg.modal-background
+      #changePanelBg.modal-background
       .modal-content
         .box
           .article
@@ -83,19 +83,21 @@ html(lang='pl-PL')
                 .field
                   label.label New Password
                   .control.has-icons-left
-                    input#username.input(class=userErr ? 'is-danger' : '', type='password', placeholder='New password' name='pass1' required)
+                    input#pass1.input(class=changeErr ? 'is-danger' : '', type='password', placeholder='New password' name='pass1' required)
                     span.icon.is-small.is-left
                       i.fas.fa-lock
                 .field
                   label.label Confirm New Password
                   .control.has-icons-left
-                    input#password.input(class=passErr ? 'is-danger' : '', type='password', placeholder='New password' name='pass2' required)
+                    input#pass2.input(class=changeErr ? 'is-danger' : '', type='password', placeholder='New password' name='pass2' required)
                     span.icon.is-small.is-left
                       i.fas.fa-lock
+                  if changeErr
+                    p.help.is-danger= changeErr
                 .field
                   p.control
                     input.button.is-success(type='submit' value='Zmień')
-      #panelClose.modal-close.is-large(aria-label='close')
+      #changePanelClose.modal-close.is-large(aria-label='close')
     
     //MAIN
     .main-container
@@ -105,7 +107,7 @@ html(lang='pl-PL')
             h1.title Wprowadzenie
             |                     Liczyć każdy może! Powodzenia!
       section.has-text-centered
-        a#startButton.button.is-huge.is-success.is-round.is-centered(href='play.html') Start!
+        a#startButton.button.is-huge.is-success.is-round.is-centered(href='play.html', disabled=(!user) ? true : false) Start!
       section#instruction.message.is-dark
         .message-header Instrukcja
         .message-body
