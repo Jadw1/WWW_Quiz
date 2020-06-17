@@ -27,25 +27,16 @@ function closeLoginPanel() {
     panel.classList.remove('is-active');
 }
 
-function login() {
-    const username = document.getElementById('username') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
+function openChangePanel() {
+    const panel = document.getElementById('changePanel');
 
-    const xhr = new XMLHttpRequest();
-    const url = '/api/login';
+    panel.classList.add('is-active');
+}
 
-    xhr.open("POST", url);
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+function closeChangePanel() {
+    const panel = document.getElementById('changePanel');
 
-
-    xhr.onload = (e) => {
-        console.log(xhr.responseText);
-        closeLoginPanel();
-    }
-    xhr.send(JSON.stringify({
-        username: username.value,
-        password: password.value
-    }));
+    panel.classList.remove('is-active');
 }
 
 export function initNavbar() {
@@ -53,5 +44,6 @@ export function initNavbar() {
     document.getElementById('loginButton').addEventListener('click', openLoginPanel);
     document.getElementById('panelBg').addEventListener('click', closeLoginPanel);
     document.getElementById('panelClose').addEventListener('click', closeLoginPanel);
-    document.getElementById('sendLogin').addEventListener('click', login);
+    document.getElementById('changePassButton').addEventListener('click', openChangePanel);
+    document.getElementById('changePassButton').addEventListener('click', closeChangePanel);
 }
