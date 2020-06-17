@@ -34,6 +34,18 @@ function loadRanking() {
     }
 }
 
+let dropdownOpened = false;
+function toggleDropdown() {
+    const dropdown = document.getElementById('quizDropdown');
+    if(dropdownOpened)
+        dropdown.classList.remove('is-active');
+    else
+        dropdown.classList.add('is-active');
+
+    dropdownOpened = !dropdownOpened;
+}
+
+document.getElementById('startButton').addEventListener('click', toggleDropdown);
 initNavbar();
 loadQuestions();
 loadRanking();

@@ -107,7 +107,14 @@ html(lang='pl-PL')
             h1.title Wprowadzenie
             |                     Liczyć każdy może! Powodzenia!
       section.has-text-centered
-        a#startButton.button.is-huge.is-success.is-round.is-centered(href='play.html', disabled=(!user) ? true : false) Start!
+        #quizDropdown.dropdown
+          .dropdown-triger
+            button#startButton.button.is-huge.is-success.is-round.is-centered(disabled=(!user) ? true : false) Start!
+          .dropdown-menu
+            .dropdown-content
+              a.dropdown-item(href='#')= 'Quiz 1'
+              a.dropdown-item(href='#')= 'Quiz 2'
+              a.dropdown-item(href='#')= 'Quiz 3'
       section#instruction.message.is-dark
         .message-header Instrukcja
         .message-body
