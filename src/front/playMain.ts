@@ -219,7 +219,7 @@ function save(event: Event) {
 }
 
 function cancel() {
-    window.location.href = './quiz.html';
+    window.location.href = '/';
 }
 
 function init() {

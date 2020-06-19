@@ -12,7 +12,7 @@ html(lang='pl-PL')
   body
     nav.navbar(role='navigation')
       .navbar-brand
-        a.navbar-item(href='quiz.html')
+        a.navbar-item(href='/')
           h1.title.is-3 Quiz
         a#navButton.navbar-burger.burger(role='button', data-target='navMenu')
           span(aria-hidden='true')
@@ -22,7 +22,7 @@ html(lang='pl-PL')
         .navbar-start
           a.navbar-item(href='#introduction')
             | Wprowadzenie
-          a.navbar-item(href='play.html')
+          a.navbar-item(href='/')
             | Rozpocznij quiz
           .navbar-item.has-dropdown.is-hoverable
             a.navbar-link
@@ -111,10 +111,8 @@ html(lang='pl-PL')
           .dropdown-triger
             button#startButton.button.is-huge.is-success.is-round.is-centered(disabled=(!user) ? true : false) Start!
           .dropdown-menu
-            .dropdown-content
-              a.dropdown-item(href='#')= 'Quiz 1'
-              a.dropdown-item(href='#')= 'Quiz 2'
-              a.dropdown-item(href='#')= 'Quiz 3'
+            #quizes.dropdown-content
+
       section#instruction.message.is-dark
         .message-header Instrukcja
         .message-body

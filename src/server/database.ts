@@ -3,8 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { exit } from 'process';
 import './database_types'
 import { User, SessionInfo } from './database_types';
-import './../common/types'
-import { Question, Quiz } from './common/types';
+import { QuestionTMP, QuizTMP } from './common/types';
 
 const databaseFilename = 'database.sqlite';
 
@@ -157,7 +156,7 @@ export class Database {
         });
     }
 
-    async addQuestion(question: Question): Promise<void> {
+    async addQuestion(question: QuestionTMP): Promise<void> {
         const sql = `
             INSERT INTO question (id, question, answer, penalty)
             VALUES (?, ?, ?, ?);
@@ -178,7 +177,7 @@ export class Database {
         return this._exec.execRun(sql, args);
     }
 
-    async getAllQuizes(): Promise<Quiz[]> {
+    async getAllQuizes(): Promise<QuizTMP[]> {
         const sql = `
             SELECT id, qu_id, question, answer, penalty
             FROM quiz
@@ -218,7 +217,7 @@ export class Database {
         });
     }
 
-    async getQuiz(id: number): Promise<Quiz> {
+    async getQuiz(id: number): Promise<QuizTMP> {
         const sql = `
             SELECT id, qu_id, question, answer, penalty
             FROM quiz
@@ -232,7 +231,7 @@ export class Database {
         `;
 
         return this._exec.execAll(sql, [id]).then(rows => {
-            const questions: Question[] = [];
+            const questions: QuestionTMP[] = [];
             rows.forEach(row => {
                 questions.push({
                     id: row.qu_id,

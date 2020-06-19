@@ -110,6 +110,11 @@
     color: blue;
 }
 
+.quiz-name {
+    text-align: center !important;
+    font-weight: bold;
+}
+
 /* Removing arrows from input of type = number */
 
 /* Chrome, Safari, Edge, Opera */

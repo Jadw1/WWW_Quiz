@@ -1,17 +1,7 @@
 import { initNavbar } from './modules/navbar.js';
-import { IQuestion, loadQuiz } from './modules/quiz.js';
 import { getStatistics } from './modules/statistics.js'
 import { buildTimerString } from './modules/timer.js'
-
-function loadQuestions() {
-    const quiz = loadQuiz();
-    const table = document.getElementById('questionTable');
-
-    for (const q of quiz) {
-        const tr = `<tr><td>${q.question}</td><td>${q.answer}</td><td>${q.penalty}s</td></tr>`;
-        table.innerHTML += tr;
-    }
-}
+import { QuizTMP, QuestionTMP} from './common/types'
 
 function loadRanking() {
     const ranking = getStatistics().sort((s1, s2) => {
@@ -45,7 +35,30 @@ function toggleDropdown() {
     dropdownOpened = !dropdownOpened;
 }
 
+function loadQuizes() {
+    const menu = document.getElementById('quizes');
+    const table = document.getElementById('questionTable');
+
+    fetch('/api/quizes').then((res) =>  {
+        if(!res.ok) {
+            console.error("Error from /api/quizes. Failed to load quizes.");
+            return;
+        }
+
+        res.json().then((quizes: QuizTMP[]) => {
+            for(const q of quizes) {
+                menu.innerHTML += `<a class="dropdown-item" href="/play/${q.id}">Quiz ${q.id}</a>`;
+
+                table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${q.id}</td></tr>`;
+                for(const qu of q.questions) {
+                    table.innerHTML += `<tr><td>${qu.question}</td><td>${qu.answer}</td><td>${qu.penalty}s</td></tr>`;
+                }
+            }
+        });
+    });
+}
+
 document.getElementById('startButton').addEventListener('click', toggleDropdown);
 initNavbar();
-loadQuestions();
 loadRanking();
+loadQuizes();

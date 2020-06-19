@@ -5,9 +5,9 @@
   "main": "main.js",
   "scripts": {
     "run": "node dist/server/app.js",
-    "compile": "npm run compile-common && npm run compile-front && npm run compile-server",
+    "compile": "npm run compile-server && npm run compile-front",
     "lint": "tslint --project .",
-    "compile-common": "cp -r src/common src/server",
+    "compile-common": "cp -r src/common src/server && cp -r src/common src/front",
     "compile-front": "tsc --project tsconfig_frontend.json",
     "compile-server": "tsc --project tsconfig_server.json",
     "test": "npx ts-node test.ts"

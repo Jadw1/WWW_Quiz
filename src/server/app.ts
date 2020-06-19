@@ -1,10 +1,8 @@
 import express from 'express';
-import path from 'path';
 import csurf from 'csurf';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { Database, SessionDatabase } from './database';
-import { STATUS_CODES } from 'http';
 
 const SECRET = 'SEKRET ZALICZAJACY ZADANIE';
 
@@ -30,6 +28,8 @@ app.set('view engine', 'pug');
 
 app.use(express.static('dist/front'));
 app.use(express.static('views'));
+// app.use('/play', express.static('dist/front'));
+// app.use('/play', express.static('views'));
 
 app.get('/', csrfProtection, (req, res) => {
     res.render('quiz', { user: req?.session?.username, csrfToken: req.csrfToken() });
@@ -97,6 +97,16 @@ app.get('/api/quizes', (req, res) => {
     db.getAllQuizes().then(quizes => {
         res.json(quizes);
     });
+});
+
+app.get('/play/:quizID(\\d+)', csrfProtection, (req, res) => {
+    if(!req?.session?.username) {
+        res.statusCode = 401;
+        res.send('User not logged in.');
+        return;
+    }
+
+    res.render('play', { user: req?.session?.username, csrfToken: req.csrfToken() });
 });
 
 const server = app.listen(1500,() => {
