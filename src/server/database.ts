@@ -3,6 +3,8 @@ import * as bcrypt from 'bcrypt';
 import { exit } from 'process';
 import './database_types'
 import { User, SessionInfo } from './database_types';
+import './../common/types'
+import { Question, Quiz } from './common/types';
 
 const databaseFilename = 'database.sqlite';
 
@@ -154,6 +156,98 @@ export class Database {
             });
         });
     }
+
+    async addQuestion(question: Question): Promise<void> {
+        const sql = `
+            INSERT INTO question (id, question, answer, penalty)
+            VALUES (?, ?, ?, ?);
+        `;
+
+        return this._exec.execRun(sql, [question.id, question.question, question.answer, question.penalty]);
+    }
+
+    async addQuiz(quizID: number, questionsIDs: number[]): Promise<void> {
+        const placeholder = questionsIDs.map(id => '(?, ?, ?)').join(', ');
+        const sql = `
+            INSERT INTO quiz (id, q_num, q_id)
+            VALUES ` + placeholder;
+
+        let i = 0;
+        const args2D = questionsIDs.map(id => [quizID, i++, id]);
+        const args = [].concat(...args2D);
+        return this._exec.execRun(sql, args);
+    }
+
+    async getAllQuizes(): Promise<Quiz[]> {
+        const sql = `
+            SELECT id, qu_id, question, answer, penalty
+            FROM quiz
+            LEFT JOIN (
+                SELECT id as qu_id, question, answer, penalty
+                FROM question
+            )
+            ON q_id = qu_id
+            ORDER BY id, q_num;
+        `;
+
+        return this._exec.execAll(sql).then(rows => {
+            const quizDict = rows.reduce((dict, row) => {
+                if(dict[row.id] === undefined) {
+                    dict[row.id] = [];
+                }
+
+                dict[row.id].push({
+                    id: row.qu_id,
+                    question: row.question,
+                    answer: row.answer,
+                    penalty: row.penalty
+                });
+                return dict;
+            }, {});
+
+            const result = [];
+            for(const key of Object.keys(quizDict)) {
+                const q = {
+                    id: Number(key),
+                    questions: quizDict[key]
+                };
+                result.push(q);
+            }
+
+            return result;
+        });
+    }
+
+    async getQuiz(id: number): Promise<Quiz> {
+        const sql = `
+            SELECT id, qu_id, question, answer, penalty
+            FROM quiz
+            LEFT JOIN (
+                SELECT id as qu_id, question, answer, penalty
+                FROM question
+            )
+            ON q_id = qu_id
+            WHERE id = ?
+            ORDER BY q_num;
+        `;
+
+        return this._exec.execAll(sql, [id]).then(rows => {
+            const questions: Question[] = [];
+            rows.forEach(row => {
+                questions.push({
+                    id: row.qu_id,
+                    question: row.question,
+                    answer: row.answer,
+                    penalty: row.penalty
+                });
+            });
+
+            return {
+                id,
+                questions
+            };
+        });
+    }
 }
 
 export class DatabaseInitiator {
@@ -166,6 +260,8 @@ export class DatabaseInitiator {
     async clear(): Promise<void> {
         const sql = `
             DROP TABLE IF EXISTS user;
+            DROP TABLE IF EXISTS question;
+            DROP TABLE IF EXISTS quiz;
         `;
         return this._exec.execExec(sql);
     }
@@ -175,6 +271,22 @@ export class DatabaseInitiator {
             CREATE TABLE user (
                 username    TEXT PRIMARY KEY,
                 pass_hash   TEXT NOT NULL
+            );
+
+            CREATE TABLE question (
+                id          INTEGER PRIMARY KEY,
+                question    TEXT NOT NULL,
+                answer      REAL NOT NULL,
+                penalty     REAL NOT NULL
+            );
+
+            CREATE TABLE quiz (
+                id          INTEGER NOT NULL,
+                q_num       INTEGER NOT NULL,
+                q_id        INTEGER NOT NULL,
+
+                PRIMARY KEY(id, q_id)
+                FOREIGN KEY(q_id) REFERENCES question(id)
             );
         `;
         return this._exec.execExec(sql);

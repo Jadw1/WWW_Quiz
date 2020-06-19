@@ -13,7 +13,6 @@ const sessionDb = new SessionDatabase();
 const SqliteStore = require('connect-sqlite3')(session);
 const csrfProtection = csurf({cookie: true});
 const app = express();
-const a = new SqliteStore();
 
 app.use(cookieParser(SECRET));
 app.use(session({
@@ -21,7 +20,7 @@ app.use(session({
     cookie: {maxAge: 15*60*1000},
     resave: false,
     saveUninitialized: true,
-    store: a
+    store: new SqliteStore()
 }));
 app.use(express.urlencoded({
     extended: true
@@ -91,6 +90,12 @@ app.post('/change', csrfProtection, (req, res) => {
         res.redirect('/');
     }).catch(err => {
         res.render('quiz', { showChangePanel: true, changeErr: err, user: req?.session?.username, csrfToken: req.csrfToken() });
+    });
+});
+
+app.get('/api/quizes', (req, res) => {
+    db.getAllQuizes().then(quizes => {
+        res.json(quizes);
     });
 });
 

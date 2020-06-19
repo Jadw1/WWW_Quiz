@@ -1,0 +1,198 @@
+.main-container {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 10%;
+    margin-left: 10%;
+}
+
+.button.is-round {
+    border-radius: 50%;
+}
+
+.is-huge, .is-huge > input {
+    font-size: 4rem;
+}
+
+.is-more-huge, .is-more-huge > input {
+    font-size: 6rem;
+}
+
+.is-size-1 > input {
+    font-size: 3rem;
+}
+
+.horizontal-scroll {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+}
+
+.question-button > div {
+    margin: auto;
+}
+
+#answer {
+    width: 3em;
+}
+
+#startButton {
+    width: 5em;
+    height: 5em;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+#instruction {
+    margin-right: 5%;
+    margin-left: 5%;
+}
+
+#questionBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#questionContainer {
+    margin: auto;
+}
+
+#questionList > button {
+    width: 60px;
+}
+
+.dont-overflow {
+    max-width: 95%;
+    overflow-x: auto;
+}
+
+#overlay {
+    background-color: rgba(49, 175, 192, 0.555);
+    width: 100%;
+    height: 100%;
+    padding-top: 150px;
+    padding-left: 20%;
+    padding-right: 20%;
+    z-index: 999;
+    display: none;
+}
+
+#overlay > .message > .message-header {
+    justify-content: center;
+}
+
+#results {
+    display: flexbox;
+    flex-direction: column;
+}
+
+#resultTable > tr > td {
+    text-align: center;
+}
+
+.center-cell {
+    text-align: center;
+}
+
+.correct {
+    color: green;
+    font-weight: bold;
+}
+
+.wrong {
+    color: red;
+    text-decoration: line-through;
+    font-weight: bold;
+}
+
+.answer-info {
+    color: blue;
+}
+
+/* Removing arrows from input of type = number */
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@media screen and (min-width: 600px) and (max-width: 1023px) {
+    .is-more-huge, .is-more-huge > input {
+        font-size: 5rem;
+    }
+
+    #answer {
+        width: 2.5em;
+    }
+
+    #overlay {
+        padding-top: 100px;
+        padding-right: 10%;
+        padding-left: 10%;
+    }
+}
+
+@media screen and (min-width: 450px) and (max-width: 599px) {
+    .is-more-huge, .is-more-huge > input {
+        font-size: 4rem;
+    }
+
+    #answer {
+        width: 1.5em;
+    }
+
+    #overlay {
+        padding-top: 50px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    #startButton {
+        width: 4.5em;
+        height: 4.5em;
+    }
+
+    .main-container {
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+}
+
+@media screen and (max-width: 449px) {
+    .is-more-huge, .is-more-huge > input {
+        font-size: 3rem;
+    }
+
+    #answer {
+        width: 1.5em;
+    }
+
+    #overlay {
+        padding-top: 50px;
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    #startButton {
+        width: 4em;
+        height: 4em;
+    }
+
+    .main-container {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    #overlayBody {
+        padding-left: 2%;
+        padding-right: 2%;
+    }
+}
