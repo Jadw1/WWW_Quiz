@@ -1,27 +1,31 @@
 import { initNavbar } from './modules/navbar.js';
-import { getStatistics } from './modules/statistics.js'
 import { buildTimerString } from './modules/timer.js'
-import { QuizTMP, QuestionTMP} from './common/types'
+import { QuizTMP, QuestionTMP, IStat, IQuizStat } from './common/types'
 
 function loadRanking() {
-    const ranking = getStatistics().sort((s1, s2) => {
-        if (s1.time < s2.time) {
-            return -1;
+    fetch('/api/stats').then((res) => {
+        if(!res.ok) {
+            console.error("Error from /api/stats. Failed to load stats.");
+            return;
         }
-        else if (s1.time > s2.time) {
-            return 1;
-        }
-        else {
-            return ((s1.correct / s1.total) > (s2.correct / s2.total)) ? -1 : 1;
-        }
+
+        res.json().then((stats: IStat[]) => {
+            const table = document.getElementById('rankingTable');
+
+            let q = -1;
+            let n = 1;
+            for(const s of stats) {
+                if(s.quizID !== q) {
+                    q = s.quizID;
+                    n = 1;
+                    table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${s.quizID}</td></tr>`;
+                }
+
+                table.innerHTML += `<tr><td>${n}</td><td>${s.user}</td><td>${buildTimerString(s.time)}</td></tr>`;
+                n++;
+            }
+        });
     });
-    const table = document.getElementById('rankingTable');
-
-    for (const s of ranking) {
-        const tr = `<tr><td>${s.nick}</td><td>${s.correct}/${s.total}</td><td>${buildTimerString(s.time)}</td></tr>`;
-
-        table.innerHTML += tr;
-    }
 }
 
 let dropdownOpened = false;
@@ -47,7 +51,13 @@ function loadQuizes() {
 
         res.json().then((quizes: QuizTMP[]) => {
             for(const q of quizes) {
-                menu.innerHTML += `<a class="dropdown-item" href="/play/${q.id}">Quiz ${q.id}</a>`;
+                const link = (!q.solved) ? `href="/play/${q.id}"` : '';
+                let name = `Quiz ${q.id}`
+                if(q.solved) {
+                    name += ' (solved)';
+                }
+
+                menu.innerHTML += `<a class="dropdown-item" ${link}>${name}</a>`;
 
                 table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${q.id}</td></tr>`;
                 for(const qu of q.questions) {
@@ -58,7 +68,58 @@ function loadQuizes() {
     });
 }
 
+function loadResults() {
+    const table = document.getElementById('urResultsTable');
+    if(table === null) {
+        return;
+    }
+
+    fetch('/api/my_stats').then((res) => {
+        if(!res.ok) {
+            console.error("Error from /api/my_stats. Failed to load results.");
+            return;
+        }
+
+        res.json().then((stats: IQuizStat[]) => {
+
+            for(const quiz of stats) {
+                // table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${quiz.quizID}</td></tr>`;
+                // table.innerHTML += `<tr><td colspan="3" class="text-center">Time: ${quiz.totalTime}</td></tr>`;
+                // table.innerHTML += `<tr><td colspan="3" class="text-center">Penalty: ${quiz.totalPenalty}s</td></tr>`;
+
+                table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${quiz.quizID}</td></tr>`;
+                table.innerHTML += `<tr><td colspan="3" class="text-center">Time: ${quiz.totalTime}     Penalty: ${quiz.totalPenalty}s</td></tr>`;
+
+                let i = 1;
+                for(const q of quiz.questions) {
+                    let ans = '';
+                    if(q.answer === q.correctAns) {
+                        ans = `<span class="correct">${q.answer}</span>`;
+                    }
+                    else {
+                        ans = `<span class="wrong">${q.answer}</span>&nbsp;<span class="answer-info">${q.correctAns}</span>`;
+                    }
+                    ans = `<td>${ans}</td>`;
+
+                    const time = `<td>${buildTimerString(q.time)}</td>`;
+
+                    let penalty = '';
+                    if(q.answer === q.correctAns) {
+                        penalty = `<td>+ ${q.penalty}s</td>`;
+                    }
+
+
+                    const row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
+                    table.innerHTML += row;
+                    i++;
+                }
+            }
+        });
+    });
+}
+
 document.getElementById('startButton').addEventListener('click', toggleDropdown);
 initNavbar();
 loadRanking();
 loadQuizes();
+loadResults();

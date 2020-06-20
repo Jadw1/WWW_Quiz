@@ -1,7 +1,10 @@
-import { IQuestion, Quiz, IStat, Stats, loadQuiz } from './modules/quiz.js';
+import { Quiz, IStat, Stats } from './modules/quiz.js';
 import { Timer, buildTimerString } from './modules/timer.js'
 import { IQuestionStat, IStatistic, saveToLocalStorage } from './modules/statistics.js';
 import { initNavbar } from './modules/navbar.js'
+import { QuizTMP ,IStartQuiz, IEndQuiz, IResult } from './common/types.js';
+import { log } from 'console';
+import { IQuizResult } from './common/types.js';
 
 const buttonSelector = i => '#questionList > button:nth-child(' + i + ')';
 
@@ -9,49 +12,86 @@ let quiz: Quiz;
 const timer: Timer = new Timer(document.getElementById('stopwatch'));
 let selectedButton: number = null;
 
-function displayOverlay() {
+function displayError(message: string) {
+    const body = document.getElementById('error-body');
+    body.innerText = message;
+
+    const modal = document.getElementById('errorPanel');
+    modal.classList.add('is-active');
+}
+
+function displayOverlay(result: IQuizResult) {
     const correctCounter = document.getElementById('correctCounter');
     const totalTime = document.getElementById('totalTime');
     const totalPenalty = document.getElementById('totalPenalty');
     const resultTable = document.getElementById('resultTable');
 
     let correct = 0;
-    let tT = 0;
-    let tP = 0;
 
-    let i = 1;
-    for (const stat of quiz.stats.stats) {
+    let i = 0;
+    for(const r of result.results) {
+        const stat = quiz.stats.stats[i];
+
         let ans = '';
-        if (stat.isCorrect) {
+        if(r.isCorrect) {
             ans = `<span class="correct">${stat.answer}</span>`;
             correct++;
         }
         else {
-            ans = `<span class="wrong">${stat.answer}</span>&nbsp;<span class="answer-info">${quiz.questions[i - 1].answer}</span>`;
+            ans = `<span class="wrong">${stat.answer}</span>&nbsp;<span class="answer-info">${r.correctAnswer}</span>`;
         }
         ans = `<td>${ans}</td>`;
-
-        const time = `<td>${buildTimerString(stat.time)}</td>`;
-        tT += stat.time;
+        const time = `<td>${buildTimerString(r.time)}</td>`;
 
         let penalty = '';
-        if (!stat.isCorrect) {
-            penalty = `<td>+ ${quiz.questions[i - 1].penalty}s</td>`;
-            tP += quiz.questions[i - 1].penalty;
+        if(!r.isCorrect) {
+            penalty = `<td>+ ${quiz.questions[i].penalty}s</td>`;
         }
 
-        const row = `<tr><td>${i}</td>${ans}${time}${penalty}</tr>`;
+        const row = `<tr><td>${i + 1}</td>${ans}${time}${penalty}</tr>`;
         resultTable.innerHTML += row;
 
         i++;
     }
 
     correctCounter.innerText = `${correct}/${quiz.questions.length}`
-    totalTime.innerText = `${buildTimerString(tT)}`;
-    totalPenalty.innerText = `+ ${tP}s`;
+    totalTime.innerText = `${buildTimerString(result.time)}`;
+    totalPenalty.innerText = `+ ${result.penalty}s`;
 
     const overlay = document.getElementById('overlay');
     overlay.style.display = 'block';
+}
+
+function endQuiz() {
+    const answers = quiz.getAnswers();
+    const path = window.location.href.split('/');
+    const id = parseInt(path[path.length - 1], 10);
+    const token = document.querySelector('meta[name=csrf-token]').getAttribute('content');
+
+    const endQ: IEndQuiz = {
+        answers,
+        statID: quiz.statID
+    };
+
+    fetch(`/api/end/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'CSRF-Token': token
+        },
+        body: JSON.stringify(endQ)
+    }).then(res => {
+        if(!res.ok) {
+            res.text().then(msg => {
+                displayError(`Failed to send results.\n${msg}`);
+            });
+            return;
+        }
+
+        res.json().then((q: IQuizResult) => {
+            displayOverlay(q);
+        });
+    });
 }
 
 function setButtonStatus(): boolean {
@@ -110,20 +150,10 @@ function submitQuestion(event: Event) {
     event.preventDefault();
     if (setButtonStatus()) {
         const answer = (document.getElementById('answer') as HTMLInputElement).valueAsNumber;
-        const result = quiz.answerQuestion(answer, timer.getTime());
-
-        if (result === null) {
-            return;
-        }
+        quiz.answerQuestion(answer, timer.getTime());
 
         const questionButton = document.querySelector(buttonSelector(quiz.activeQuestion));
         questionButton.classList.remove('is-info');
-        if (result) {
-            questionButton.classList.add('is-success');
-        }
-        else {
-            questionButton.classList.add('is-danger');
-        }
 
         const next = quiz.nextQuestion();
         if (next > 0) {
@@ -131,7 +161,7 @@ function submitQuestion(event: Event) {
         }
         else {
             timer.pause();
-            displayOverlay();
+            endQuiz();
         }
     }
 }
@@ -160,66 +190,35 @@ function createButtons() {
     }
 }
 
-function verifyNick() {
-    const nick = (document.getElementById('nick') as HTMLInputElement).value;
-    const saveButton = document.getElementById('save');
+function loadQuiz() {
+    const path = window.location.href.split('/');
+    const id = parseInt(path[path.length - 1], 10);
 
-    if (nick.trim().length > 0) {
-        saveButton.removeAttribute('disabled');
-    }
-    else {
-        saveButton.setAttribute('disabled', '');
-    }
-}
-
-function save(event: Event) {
-    event.preventDefault();
-    const doSave = (document.getElementById('saveStats') as HTMLInputElement).checked;
-    const stats = quiz.stats;
-    let questions: IQuestionStat[];
-    if (doSave) {
-        questions = [];
+    if(Object.is(id, NaN)) {
+        displayError(`Wrong quiz index.`);
+        return;
     }
 
-
-    let correct = 0;
-    let penalty = 0;
-    let i = 0;
-    for (const stat of stats.stats) {
-        if (!stat.isCorrect) {
-            penalty += quiz.questions[i].penalty;
-        }
-        else {
-            correct++;
+    fetch(`/api/quiz/${id}`).then(res => {
+        if(!res.ok) {
+            res.text().then(msg => {
+                displayError(`Failed to download quiz.\n${msg}`);
+            });
+            return;
         }
 
-        if (doSave) {
-            const qStat: IQuestionStat = {
-                correct: stat.isCorrect,
-                time: stat.time,
-                answer: stat.answer
-            };
-            questions.push(qStat);
-        }
-        i++;
-    }
+        res.json().then((q: IStartQuiz) => {
+            if(q.quiz === undefined || q.statID < 0) {
+                displayError('Invalid quiz id.');
+                return;
+            }
 
-    const result: IStatistic = {
-        nick: (document.getElementById('nick') as HTMLInputElement).value,
-        time: stats.totalTime + 1000 * penalty,
-        correct,
-        total: quiz.questions.length
-    };
-    if (doSave) {
-        result.questions = questions;
-    }
-    saveToLocalStorage(result);
-
-    window.location.href = './quiz.html';
-}
-
-function cancel() {
-    window.location.href = '/';
+            quiz = new Quiz(q);
+            createButtons();
+            setActiveQuestion(1);
+            setButtonStatus();
+        });
+    });
 }
 
 function init() {
@@ -228,18 +227,9 @@ function init() {
     form.addEventListener('submit', submitQuestion);
     document.getElementById('skipButton').addEventListener('click', skip);
 
-    const saveForm = document.getElementById('saveForm');
-    saveForm.addEventListener('input', verifyNick);
-    saveForm.addEventListener('submit', save);
-    document.getElementById('cancel').addEventListener('click', cancel);
-
-    quiz = new Quiz(loadQuiz());
     initNavbar();
-    createButtons();
     timer.run();
-    setActiveQuestion(1);
-    setButtonStatus();
-    verifyNick();
 }
 
 init();
+loadQuiz();

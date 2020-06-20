@@ -115,6 +115,14 @@
     font-weight: bold;
 }
 
+.text-center {
+    text-align: center !important;
+}
+
+.auto-margin {
+    margin: auto;
+}
+
 /* Removing arrows from input of type = number */
 
 /* Chrome, Safari, Edge, Opera */

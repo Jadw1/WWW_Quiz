@@ -121,20 +121,37 @@ html(lang='pl-PL')
       .columns.is-centered.has-text-centered
         .column.is-half.level
           section.level-item
-            table#questions.table
-              thead
-                tr
-                  th Pytanie
-                  th Odpowiedź
-                  th Kara
-              tbody#questionTable
-                tr
+            .column
+              p.title.is-3
+                | Quizes
+              table#questions.table.auto-margin
+                thead
+                  tr
+                    th Pytanie
+                    th Odpowiedź
+                    th Kara
+                tbody#questionTable
+                  tr
         .column.is-half.level
           section.level-item
-            table#ranking.table
-              thead
-                tr
-                  th Nick
-                  th Poprawnych
-                  th Czas
-              tbody#rankingTable
+            .column
+              if user
+                p.title.is-3
+                  | Your results
+                table#urResults.table.auto-margin
+                  thead
+                    tr
+                      th No.
+                      th Answer
+                      th Time
+                  tbody#urResultsTable
+
+              p.title.is-3
+                | Top 5
+              table#ranking.table.auto-margin
+                thead
+                  tr
+                    th Place
+                    th User
+                    th Time
+                tbody#rankingTable

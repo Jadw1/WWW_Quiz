@@ -5,6 +5,7 @@ html(lang='pl-PL')
     meta(http-equiv="X-UA-Compatible' content='IE=edge")
     title Quiz
     meta(name='viewport', content='width=device-width, initial-scale=1')
+    meta(name='csrf-token' content=`${csrfToken}`)
     link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css')
     link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bulma/0.8.2/css/bulma.css')
     link(rel='stylesheet', type='text/css', media='screen', href='/main.css')
@@ -35,18 +36,8 @@ html(lang='pl-PL')
                     th.center-cell Odpowiedź
                     th.center-cell Czas
                 tbody#resultTable.dont-overflow
-              form#saveForm
-                .label Podaj swój nick:
-                input#nick.input.is-focused(type='text', placeholder='Nick')
-                label.checkbox
-                  input#saveStats(type='checkbox')
-                  |                                 Zapisz statystyki
-                .level
-                  .level-left
-                  .level-right
-                    .level-item.buttons
-                      input#save.button.is-success(type='submit', value='Zapisz')
-                      input#cancel.button.is-danger(type='button', value='Anuluj')
+              a.button.is-success(href='/')
+                | Strona główna
     nav.navbar(role='navigation')
       .navbar-brand
         a.navbar-item(href='/')
@@ -136,6 +127,20 @@ html(lang='pl-PL')
                     input.button.is-success(type='submit' value='Zmień')
       #changePanelClose.modal-close.is-large(aria-label='close')
     
+    #errorPanel.modal
+      .modal-background
+      .modal-content
+        .article.message.is-danger
+          .message-header
+            p An error occurred.
+          .message-body
+            span#error-body
+            .buttons.is-centered
+              a.button.is-danger(href='/')
+                | Back to main page
+
+            
+
     .main-container
       section#intro.message.is-dark
         .message-header Wprowadzenie
@@ -154,7 +159,7 @@ html(lang='pl-PL')
         .level.dont-overflow
           .level-item.dont-overflow
             #questionBox.is-more-huge.dont-overflow
-              #question 2 + 2
+              #question
               span.field.has-addons.is-more-huge
                 div  = 
                 input#answer(type='number')

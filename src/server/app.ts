@@ -3,6 +3,8 @@ import csurf from 'csurf';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import { Database, SessionDatabase } from './database';
+import { IStartQuiz, IEndQuiz, IResult, IQuizResult } from './common/types';
+import { IDBAnswer } from './database_types';
 
 const SECRET = 'SEKRET ZALICZAJACY ZADANIE';
 
@@ -28,8 +30,6 @@ app.set('view engine', 'pug');
 
 app.use(express.static('dist/front'));
 app.use(express.static('views'));
-// app.use('/play', express.static('dist/front'));
-// app.use('/play', express.static('views'));
 
 app.get('/', csrfProtection, (req, res) => {
     res.render('quiz', { user: req?.session?.username, csrfToken: req.csrfToken() });
@@ -94,7 +94,16 @@ app.post('/change', csrfProtection, (req, res) => {
 });
 
 app.get('/api/quizes', (req, res) => {
-    db.getAllQuizes().then(quizes => {
+    db.getAllQuizes().then(async (quizes) => {
+        if(req?.session?.username) {
+            const solved = await db.getSolved(req?.session?.username);
+
+            quizes.forEach(q => q.solved = solved.includes(q.id));
+        }
+        else {
+            quizes.forEach(q => q.solved = false);
+        }
+
         res.json(quizes);
     });
 });
@@ -108,6 +117,121 @@ app.get('/play/:quizID(\\d+)', csrfProtection, (req, res) => {
 
     res.render('play', { user: req?.session?.username, csrfToken: req.csrfToken() });
 });
+
+app.get('/api/quiz/:quizID(\\d+)', csrfProtection, (req, res) => {
+    if(!req?.session?.username) {
+        res.statusCode = 401;
+        res.send('User not logged in.');
+        return;
+    }
+
+    const id = parseInt(req.params.quizID, 10);
+    if(Object.is(id, NaN)) {
+        res.statusCode = 400;
+        res.send('Invalid quizID');
+        return;
+    }
+
+    const q: IStartQuiz = {};
+
+    db.getQuiz(id).then(quiz => {
+        if(quiz.questions.length === 0) {
+            return -1;
+        }
+
+        q.quiz = quiz;
+        return db.startQuiz(id, req?.session?.username)
+    }).then(statID => {
+        if(statID >= 0) {
+            q.statID = statID;
+        }
+
+        res.json(q);
+    });
+});
+
+app.post('/api/end/:quizID(\\d+)', csrfProtection, (req, res) => {
+    if(!req?.session?.username) {
+        res.statusCode = 401;
+        res.send('User not logged in.');
+        return;
+    }
+
+    const id = parseInt(req.params.quizID, 10);
+    if(Object.is(id, NaN)) {
+        res.statusCode = 400;
+        res.send('Invalid quizID');
+        return;
+    }
+
+    const end: IEndQuiz = req.body;
+
+    db.isSolved(req?.session?.username, id).then(solved => {
+        if(solved) {
+            res.statusCode = 405;
+            res.send('Quiz already solved.');
+            return;
+        }
+
+        db.endQuiz(end.statID, id, req?.session?.username)
+        .then(async (time) => {
+            const quiz = await db.getQuiz(id);
+
+            const ans: IDBAnswer[] = [];
+            let totalPenalty = 0;
+            end.answers.forEach((a, i) => {
+                const dbAns: IDBAnswer = {
+                    qNum: i,
+                    answer: a.answer,
+                    correct: (a.answer === quiz.questions[i].answer),
+                    time: time * a.timeFraction
+                };
+
+                if(!dbAns.correct) {
+                    totalPenalty += quiz.questions[i].penalty;
+                }
+                ans.push(dbAns);
+            });
+            await db.setPenalty(end.statID, totalPenalty);
+
+            return db.addAnswers(end.statID, ans).then(() => {
+                const results: IResult[] = ans.map((a, i) => {
+                    return {
+                        isCorrect: a.correct,
+                        correctAnswer: quiz.questions[i].answer,
+                        time: a.time
+                    }
+                });
+
+                const quizResult: IQuizResult = {
+                    results,
+                    penalty: totalPenalty,
+                    time
+                };
+
+                res.json(quizResult);
+            });
+        });
+    });
+});
+
+app.get('/api/stats', (req, res) => {
+    db.getStatistics().then(stats => {
+        res.json(stats);
+    });
+});
+
+app.get('/api/my_stats', (req, res) => {
+    if(!req?.session?.username) {
+        res.statusCode = 401;
+        res.send('User not logged in.');
+        return;
+    }
+
+    db.getUserStat(req?.session?.username).then(stats => {
+        res.json(stats);
+    });
+})
 
 const server = app.listen(1500,() => {
     console.log(`App is running at http://localhost:1500/ in ${app.get('env')} mode`);

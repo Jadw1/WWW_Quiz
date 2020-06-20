@@ -1,13 +1,8 @@
-interface IQuestion {
-    question: string;
-    answer: number;
-    penalty: number;
-}
+import { QuestionTMP, IAnswer, IStartQuiz } from './../common/types'
 
 interface IStat {
     answered: boolean;
     answer: number;
-    isCorrect: boolean;
     time: number;
 }
 
@@ -32,19 +27,21 @@ class Stats {
 }
 
 class Quiz {
-    questions: IQuestion[];
+    questions: QuestionTMP[];
     stats: Stats
     activeQuestion: number;
     questionStartTime: number;
+    statID: number;
 
-    constructor(questions: IQuestion[]) {
-        this.questions = questions;
+    constructor(quiz: IStartQuiz) {
+        this.questions = quiz.quiz.questions;
+        this.statID = quiz.statID;
         this.stats = new Stats(this.questions.length);
         this.activeQuestion = null;
         this.questionStartTime = null;
     }
 
-    setActiveQuestion(i: number, time: number): IQuestion {
+    setActiveQuestion(i: number, time: number): QuestionTMP {
         if (i <= 0 || i > this.questions.length) {
             return null;
         }
@@ -59,7 +56,7 @@ class Quiz {
         return this.questions[this.activeQuestion - 1];
     }
 
-    answerQuestion(answer: number, time: number): boolean {
+    answerQuestion(answer: number, time: number) {
         const stat = this.stats.stats[this.activeQuestion - 1];
         if (stat.answered) {
             return null;
@@ -67,13 +64,10 @@ class Quiz {
 
         stat.answer = answer;
         stat.answered = true;
-        stat.isCorrect = stat.answer === this.questions[this.activeQuestion - 1].answer;
 
         this.stats.answeredCount += 1;
         this.stats.stats[this.activeQuestion - 1].time += (time - this.questionStartTime);
         this.stats.totalTime += (time - this.questionStartTime);
-
-        return stat.isCorrect;
     }
 
     nextQuestion(): number {
@@ -107,65 +101,17 @@ class Quiz {
     isAnswered(i: number) {
         return this.stats.stats[i - 1].answered;
     }
+
+    getAnswers(): IAnswer[] {
+        const totalTime = this.stats.totalTime;
+
+        return this.stats.stats.map(s =>  {
+            return {
+                answer: s.answer,
+                timeFraction: (s.time / totalTime)
+            } as IAnswer
+        });
+    }
 }
 
-const quizString = `{
-    "quiz": [
-        {
-            "question": "2 + 2",
-            "answer": 4,
-            "penalty": 0.5
-        },
-        {
-            "question": "6 / 2",
-            "answer": 3,
-            "penalty": 1
-        },
-        {
-            "question": "42 / 2",
-            "answer": 21,
-            "penalty": 3
-        },
-        {
-            "question": "(2 + 2) / 4 + 1",
-            "answer": 2,
-            "penalty": 2.25
-        },
-        {
-            "question": "35 * 24",
-            "answer": 840,
-            "penalty": 2.25
-        },
-        {
-            "question": "2 - (-24 : 4)",
-            "answer": 8,
-            "penalty": 3
-        },
-        {
-            "question": "(3^2 + 8) -  10 / 5",
-            "answer": 15,
-            "penalty": 4.5
-        },
-        {
-            "question": "12 * 12 -  (10 / 5)^3",
-            "answer": 136,
-            "penalty": 4.25
-        },
-        {
-            "question": "2 + 2 * 2",
-            "answer": 6,
-            "penalty": 2
-        },
-        {
-            "question": "(2^3 * 3^2 + 5) / 7",
-            "answer": 11,
-            "penalty": 4.2
-        }
-    ]
-}`;
-
-function loadQuiz(): IQuestion[] {
-    return JSON.parse(quizString).quiz as IQuestion[];
-}
-
-export { IQuestion, Quiz, IStat, Stats, loadQuiz }
+export { Quiz, IStat, Stats }
