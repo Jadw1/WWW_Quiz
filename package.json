@@ -10,7 +10,7 @@
     "compile-common": "cp -r src/common src/server && cp -r src/common src/front",
     "compile-front": "tsc --project tsconfig_frontend.json",
     "compile-server": "tsc --project tsconfig_server.json",
-    "test": "npx ts-node test.ts"
+    "createdb": "npx ts-node createdb.ts"
   },
   "author": "Michal Jadwiszczak",
   "dependencies": {

@@ -133,20 +133,27 @@ app.get('/api/quiz/:quizID(\\d+)', csrfProtection, (req, res) => {
     }
 
     const q: IStartQuiz = {};
-
-    db.getQuiz(id).then(quiz => {
-        if(quiz.questions.length === 0) {
-            return -1;
+    db.isSolved(req?.session?.username, id).then(solved => {
+        if(solved) {
+            res.statusCode = 405;
+            res.send('Quiz already solved.');
+            return;
         }
 
-        q.quiz = quiz;
-        return db.startQuiz(id, req?.session?.username)
-    }).then(statID => {
-        if(statID >= 0) {
-            q.statID = statID;
-        }
+        db.getQuiz(id).then(quiz => {
+            if(quiz.questions.length === 0) {
+                return -1;
+            }
 
-        res.json(q);
+            q.quiz = quiz;
+            return db.startQuiz(id, req?.session?.username)
+        }).then(statID => {
+            if(statID >= 0) {
+                q.statID = statID;
+            }
+
+            res.json(q);
+        });
     });
 });
 
