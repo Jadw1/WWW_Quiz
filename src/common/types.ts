@@ -1,13 +1,13 @@
-export interface QuestionTMP {
+export interface IQuestion {
     id: number,
     question: string,
     answer?: number,
     penalty: number
 };
 
-export interface QuizTMP {
+export interface IQuiz {
     id: number,
-    questions: QuestionTMP[],
+    questions: IQuestion[],
     solved?: boolean
 };
 
@@ -17,7 +17,7 @@ export interface IAnswer {
 };
 
 export interface IStartQuiz {
-    quiz?: QuizTMP,
+    quiz?: IQuiz,
     statID?: number
 };
 

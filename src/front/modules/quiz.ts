@@ -1,4 +1,4 @@
-import { QuestionTMP, IAnswer, IStartQuiz } from './../common/types'
+import { IQuestion, IAnswer, IStartQuiz } from './../common/types'
 
 interface IStat {
     answered: boolean;
@@ -27,7 +27,7 @@ class Stats {
 }
 
 class Quiz {
-    questions: QuestionTMP[];
+    questions: IQuestion[];
     stats: Stats
     activeQuestion: number;
     questionStartTime: number;
@@ -41,7 +41,7 @@ class Quiz {
         this.questionStartTime = null;
     }
 
-    setActiveQuestion(i: number, time: number): QuestionTMP {
+    setActiveQuestion(i: number, time: number): IQuestion {
         if (i <= 0 || i > this.questions.length) {
             return null;
         }

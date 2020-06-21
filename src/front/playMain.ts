@@ -2,7 +2,7 @@ import { Quiz, IStat, Stats } from './modules/quiz.js';
 import { Timer, buildTimerString } from './modules/timer.js'
 import { IQuestionStat, IStatistic, saveToLocalStorage } from './modules/statistics.js';
 import { initNavbar } from './modules/navbar.js'
-import { QuizTMP ,IStartQuiz, IEndQuiz, IResult } from './common/types.js';
+import { IQuiz ,IStartQuiz, IEndQuiz, IResult } from './common/types.js';
 import { log } from 'console';
 import { IQuizResult } from './common/types.js';
 

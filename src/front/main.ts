@@ -1,6 +1,6 @@
 import { initNavbar } from './modules/navbar.js';
 import { buildTimerString } from './modules/timer.js'
-import { QuizTMP, QuestionTMP, IStat, IQuizStat } from './common/types'
+import { IQuiz, IQuestion, IStat, IQuizStat } from './common/types'
 
 function loadRanking() {
     fetch('/api/stats').then((res) => {
@@ -49,7 +49,7 @@ function loadQuizes() {
             return;
         }
 
-        res.json().then((quizes: QuizTMP[]) => {
+        res.json().then((quizes: IQuiz[]) => {
             for(const q of quizes) {
                 const link = (!q.solved) ? `href="/play/${q.id}"` : '';
                 let name = `Quiz ${q.id}`

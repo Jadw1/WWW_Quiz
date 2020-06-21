@@ -3,8 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { exit } from 'process';
 import './database_types'
 import { User, SessionInfo, IDBAnswer } from './database_types';
-import { QuestionTMP, QuizTMP, IStat, IQuizStat, IQuestionStat } from './common/types';
-import { statSync } from 'fs';
+import { IQuestion, IQuiz, IStat, IQuizStat, IQuestionStat } from './common/types';
 
 const databaseFilename = 'database.sqlite';
 
@@ -77,7 +76,6 @@ export class Database {
         this._exec = new DatabaseExecutor(databaseFilename);
         (async () => {
             this.statID = (await this._exec.execGet('SELECT ifnull(MAX(id), -1) as id FROM stat;')).id + 1;
-            console.log(`Id: ${this.statID}`);
         })();
     }
 
@@ -162,7 +160,7 @@ export class Database {
         });
     }
 
-    async addQuestion(question: QuestionTMP): Promise<void> {
+    async addQuestion(question: IQuestion): Promise<void> {
         const sql = `
             INSERT INTO question (id, question, answer, penalty)
             VALUES (?, ?, ?, ?);
@@ -183,7 +181,7 @@ export class Database {
         return this._exec.execRun(sql, args);
     }
 
-    async getAllQuizes(): Promise<QuizTMP[]> {
+    async getAllQuizes(): Promise<IQuiz[]> {
         const sql = `
             SELECT id, qu_id, question, answer, penalty
             FROM quiz
@@ -223,7 +221,7 @@ export class Database {
         });
     }
 
-    async getQuiz(id: number): Promise<QuizTMP> {
+    async getQuiz(id: number): Promise<IQuiz> {
         const sql = `
             SELECT id, qu_id, question, answer, penalty
             FROM quiz
@@ -237,7 +235,7 @@ export class Database {
         `;
 
         return this._exec.execAll(sql, [id]).then(rows => {
-            const questions: QuestionTMP[] = [];
+            const questions: IQuestion[] = [];
             rows.forEach(row => {
                 questions.push({
                     id: row.qu_id,
