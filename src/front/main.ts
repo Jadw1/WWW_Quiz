@@ -83,12 +83,8 @@ function loadResults() {
         res.json().then((stats: IQuizStat[]) => {
 
             for(const quiz of stats) {
-                // table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${quiz.quizID}</td></tr>`;
-                // table.innerHTML += `<tr><td colspan="3" class="text-center">Time: ${quiz.totalTime}</td></tr>`;
-                // table.innerHTML += `<tr><td colspan="3" class="text-center">Penalty: ${quiz.totalPenalty}s</td></tr>`;
-
                 table.innerHTML += `<tr><td colspan="3" class="quiz-name">Quiz ${quiz.quizID}</td></tr>`;
-                table.innerHTML += `<tr><td colspan="3" class="text-center">Time: ${quiz.totalTime}     Penalty: ${quiz.totalPenalty}s</td></tr>`;
+                table.innerHTML += `<tr><td colspan="3" class="text-center">Time: ${buildTimerString(quiz.totalTime)}     Penalty: ${quiz.totalPenalty}s</td></tr>`;
 
                 let i = 1;
                 for(const q of quiz.questions) {
@@ -101,7 +97,7 @@ function loadResults() {
                     }
                     ans = `<td>${ans}</td>`;
 
-                    const time = `<td>${buildTimerString(q.time)}</td>`;
+                    const time = `<td>${buildTimerString(q.time * quiz.totalTime)}</td>`;
 
                     let penalty = '';
                     if(q.answer === q.correctAns) {

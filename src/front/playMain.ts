@@ -41,7 +41,7 @@ function displayOverlay(result: IQuizResult) {
             ans = `<span class="wrong">${stat.answer}</span>&nbsp;<span class="answer-info">${r.correctAnswer}</span>`;
         }
         ans = `<td>${ans}</td>`;
-        const time = `<td>${buildTimerString(r.time)}</td>`;
+        const time = `<td>${buildTimerString(r.time * result.time)}</td>`;
 
         let penalty = '';
         if(!r.isCorrect) {

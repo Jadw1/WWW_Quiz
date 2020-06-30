@@ -158,6 +158,7 @@ app.get('/api/quiz/:quizID(\\d+)', csrfProtection, (req, res) => {
 });
 
 app.post('/api/end/:quizID(\\d+)', csrfProtection, (req, res) => {
+    const endTime = Date.now();
     if(!req?.session?.username) {
         res.statusCode = 401;
         res.send('User not logged in.');
@@ -173,43 +174,41 @@ app.post('/api/end/:quizID(\\d+)', csrfProtection, (req, res) => {
 
     const end: IEndQuiz = req.body;
 
-    db.isSolved(req?.session?.username, id).then(solved => {
+    db.isSolved(req?.session?.username, id).then(async solved => {
         if(solved) {
             res.statusCode = 405;
             res.send('Quiz already solved.');
             return;
         }
 
-        db.endQuiz(end.statID, id, req?.session?.username)
-        .then(async (time) => {
-            const quiz = await db.getQuiz(id);
+        const quiz = await db.getQuiz(id);
 
-            const ans: IDBAnswer[] = [];
-            let totalPenalty = 0;
-            end.answers.forEach((a, i) => {
-                const dbAns: IDBAnswer = {
-                    qNum: i,
-                    answer: a.answer,
-                    correct: (a.answer === quiz.questions[i].answer),
-                    time: time * a.timeFraction
-                };
+        const ans: IDBAnswer[] = [];
+        let totalPenalty = 0;
+        end.answers.forEach((a, i) => {
+            const dbAns: IDBAnswer = {
+                qNum: i,
+                answer: a.answer,
+                correct: (a.answer === quiz.questions[i].answer),
+                time: a.timeFraction
+            };
 
-                if(!dbAns.correct) {
-                    totalPenalty += quiz.questions[i].penalty;
+            if(!dbAns.correct) {
+                totalPenalty += quiz.questions[i].penalty;
+            }
+            ans.push(dbAns);
+        });
+
+        return db.saveResults(end.statID, endTime, id, req?.session?.username, totalPenalty, ans).then(() => {
+            const results: IResult[] = ans.map((a, i) => {
+                return {
+                    isCorrect: a.correct,
+                    correctAnswer: quiz.questions[i].answer,
+                    time: a.time
                 }
-                ans.push(dbAns);
             });
-            await db.setPenalty(end.statID, totalPenalty);
 
-            return db.addAnswers(end.statID, ans).then(() => {
-                const results: IResult[] = ans.map((a, i) => {
-                    return {
-                        isCorrect: a.correct,
-                        correctAnswer: quiz.questions[i].answer,
-                        time: a.time
-                    }
-                });
-
+            db.getStatTime(end.statID).then(time => {
                 const quizResult: IQuizResult = {
                     results,
                     penalty: totalPenalty,

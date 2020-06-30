@@ -4,6 +4,7 @@ import { exit } from 'process';
 import './database_types'
 import { User, SessionInfo, IDBAnswer } from './database_types';
 import { IQuestion, IQuiz, IStat, IQuizStat, IQuestionStat } from './common/types';
+import { exec } from 'child_process';
 
 const databaseFilename = 'database.sqlite';
 
@@ -262,42 +263,24 @@ export class Database {
         return this._exec.execRun(sql, [insertID, quizID, user, Date.now()]).then(() => insertID);
     }
 
-    async endQuiz(id: number, quizID: number, user: string): Promise<number> {
-        const sql = `
-            UPDATE stat
-            SET end_time = ?
-            WHERE id = ? AND quiz_id = ? AND username = ?;
+    async saveResults(id: number, endtime: number, quizID: number, user: string, penalty: number, answers: IDBAnswer[]): Promise<void> {
+        const endQuizSql = `
+            UPDATE OR ROLLBACK stat
+            SET end_time = ${endtime}, penalty = ${penalty}
+            WHERE id = ${id} AND quiz_id = ${quizID} AND username = '${user}';
         `;
-        const getTime = `
-            SELECT start_time, end_time
-            FROM stat
-            WHERE id = ?;
-        `
-
-        return this._exec.execRun(sql, [Date.now(), id, quizID, user])
-                .then(() => this._exec.execGet(getTime, [id]))
-                .then(row => row.end_time - row.start_time);
-    }
-
-    async setPenalty(statID: number, penalty: number): Promise<void> {
+        const placeholder = answers.map(a => `(${id}, ${a.qNum}, ${a.correct}, ${a.answer}, ${a.time})`).join(', ');
+        const answersSql = `
+            INSERT OR ROLLBACK INTO answer (stat_id, q_num, correct, answer, time)
+            VALUES ` + placeholder + `;`;
         const sql = `
-            UPDATE stat
-            SET penalty = ?
-            WHERE id = ?;
+            begin;
+            ${endQuizSql}
+            ${answersSql}
+            commit;
         `;
 
-        return this._exec.execRun(sql, [penalty, statID]);
-    }
-
-    async addAnswers(statID: number, answers: IDBAnswer[]): Promise<void> {
-        const placeholder = answers.map(id => '(?, ?, ?, ?, ?)').join(', ');
-        const sql = `
-            INSERT INTO answer (stat_id, q_num, correct, answer, time)
-            VALUES ` + placeholder;
-
-        const args2D = answers.map(a => [statID, a.qNum, a.correct, a.answer, a.time]);
-        const args = [].concat(...args2D);
-        return this._exec.execRun(sql, args);
+        return this._exec.execExec(sql);
     }
 
     async getSolved(user: string): Promise<number[]> {
@@ -318,6 +301,16 @@ export class Database {
         `;
 
         return this._exec.execGet(sql, [quizID, user]).then(row => row !== undefined);
+    }
+
+    async getStatTime(statID: number): Promise<number> {
+        const sql = `
+            SELECT (end_time - start_time) as time
+            FROM stat
+            WHERE end_time IS NOT NULL AND id = ?;
+        `;
+
+        return this._exec.execGet(sql, [statID]).then(row => row.time);
     }
 
     async getStatistics(): Promise<IStat[]> {
@@ -372,7 +365,7 @@ export class Database {
 
         return this._exec.execAll(sql, [user]).then(async (rows) => {
             if(rows.length === 0) {
-                return;
+                return [];
             }
 
             const statsID = rows.map(r => r.id);
