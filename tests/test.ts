@@ -87,6 +87,22 @@ describe('test server for correct quiz managemant', () => {
         const overlayDisplay = await overlay.getCssValue('display');
         expect(overlayDisplay).to.include('block');
 
+
+        const correct = await driver.findAll('.correct');
+        expect(correct.length).to.be.equal(2);
+        for(const ans of correct) {
+            const text = await ans.getText();
+            expect(text).to.be.equal('4');
+        }
+
+        const wrong = await driver.findAll('.wrong');
+        expect(wrong.length).to.be.equal(4);
+        for(const ans of wrong) {
+            const text = await ans.getText();
+            expect(text).to.be.equal('4');
+        }
+
+
         const returnButton = await driver.find('#results > a');
         await returnButton.doClick();
 
